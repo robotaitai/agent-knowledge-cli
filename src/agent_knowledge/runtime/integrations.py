@@ -31,24 +31,50 @@ def _copy_template(src: Path, dst: Path, replacements: dict[str, str], *, force:
     return "created" if not dst.exists() else "updated"
 
 
+_CURSOR_RULE = """\
+---
+description: Agent knowledge system -- read on every session
+alwaysApply: true
+---
+
+This project uses agent-knowledge for persistent memory.
+
+On session start:
+1. Read `./agent-knowledge/STATUS.md`
+2. If `onboarding: pending`, read `AGENTS.md` and follow the First-Time Onboarding instructions
+3. If `onboarding: complete`, read `./agent-knowledge/Memory/MEMORY.md` for project context
+"""
+
+
 def install_cursor(repo: Path, *, dry_run: bool = False, force: bool = False) -> list[str]:
-    """Install Cursor hooks.json integration."""
+    """Install Cursor hooks and rules integration."""
     assets = get_assets_dir()
     actions = []
     repo_abs = str(repo.resolve())
 
+    # Hooks
     hooks_src = assets / "templates" / "integrations" / "cursor" / "hooks.json"
     hooks_dst = repo / ".cursor" / "hooks.json"
-
     if hooks_dst.exists() and not force:
-        actions.append(f"  exists: {hooks_dst.relative_to(repo)}")
+        actions.append("  exists: .cursor/hooks.json")
     elif dry_run:
-        actions.append(f"  [dry-run] would create: .cursor/hooks.json")
+        actions.append("  [dry-run] would create: .cursor/hooks.json")
     else:
         hooks_dst.parent.mkdir(parents=True, exist_ok=True)
         content = hooks_src.read_text().replace("<repo-path>", repo_abs)
         hooks_dst.write_text(content)
-        actions.append(f"  created: .cursor/hooks.json")
+        actions.append("  created: .cursor/hooks.json")
+
+    # Rule
+    rule_dst = repo / ".cursor" / "rules" / "agent-knowledge.mdc"
+    if rule_dst.exists() and not force:
+        actions.append("  exists: .cursor/rules/agent-knowledge.mdc")
+    elif dry_run:
+        actions.append("  [dry-run] would create: .cursor/rules/agent-knowledge.mdc")
+    else:
+        rule_dst.parent.mkdir(parents=True, exist_ok=True)
+        rule_dst.write_text(_CURSOR_RULE)
+        actions.append("  created: .cursor/rules/agent-knowledge.mdc")
 
     return actions
 

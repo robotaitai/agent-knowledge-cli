@@ -11,7 +11,7 @@ Test strategy for packaging validation and CLI correctness.
 ## Current State
 
 - Framework: `pytest` (dev dependency).
-- 27 tests across 2 files: `tests/test_packaging.py` and `tests/test_cli.py`.
+- 38 tests across 2 files: `tests/test_packaging.py` and `tests/test_cli.py`.
 
 ### test_packaging.py
 - Verifies package is importable and `__version__` exists.
