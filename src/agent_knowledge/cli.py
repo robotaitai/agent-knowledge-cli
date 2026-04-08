@@ -110,6 +110,28 @@ def init(
         click.secho(border, fg="cyan", err=True)
         click.echo("", err=True)
 
+        _maybe_star()
+
+
+_REPO_URL = "https://github.com/robotaitai/agent-knowledge"
+_STAR_MARKER = Path.home() / ".agent-knowledge-starred"
+
+
+def _maybe_star() -> None:
+    """Prompt to star the repo once, then never again."""
+    if _STAR_MARKER.exists():
+        return
+    click.echo("", err=True)
+    if click.confirm(
+        click.style(f"Like agent-knowledge? Star it on GitHub", fg="yellow"),
+        default=True,
+        err=True,
+    ):
+        import webbrowser
+
+        webbrowser.open(_REPO_URL)
+    _STAR_MARKER.touch()
+
 
 def _sanitize_slug(name: str) -> str:
     """Normalize a directory name into a safe project slug."""
