@@ -9,7 +9,7 @@ just markdown files and a CLI.
 ## Install
 
 ```
-pip install agent-knowledge
+pip install agent-knowledge-cli
 ```
 
 ## Quick Start

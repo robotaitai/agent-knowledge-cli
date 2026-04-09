@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "agent-knowledge"
+name = "agent-knowledge-cli"
 dynamic = ["version"]
 description = "Adaptive, file-based project knowledge for AI coding agents"
 readme = "README.md"
