@@ -247,12 +247,3 @@ json_summary="$json_summary\"warnings\":$(kc_json_array "${WARNINGS[@]+"${WARNIN
 json_summary="$json_summary}"
 kc_write_json_output "$json_summary"
 
-if [ "$JSON_MODE" -ne 1 ]; then
-    kc_log ""
-    kc_log "Next steps:"
-    kc_log "  1. agent-knowledge doctor --project $TARGET_PROJECT"
-    kc_log "  2. Review $AGENT_PROJECT_FILE"
-    if [ "$INSTALL_HOOKS" -eq 1 ]; then
-        kc_log "  3. Review $CURSOR_HOOKS_FILE before enabling editor hooks"
-    fi
-fi

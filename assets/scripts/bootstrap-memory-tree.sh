@@ -385,9 +385,4 @@ if [ "$JSON_MODE" -ne 1 ]; then
     kc_log ""
     kc_log "Memory tree ready for: $PROJECT_NAME"
     kc_log "Profile hint: $PROFILE"
-    kc_log ""
-    kc_log "Next steps:"
-    kc_log "  1. agent-knowledge import --project $TARGET_PROJECT"
-    kc_log "  2. Agent inspects repo and creates initial branch notes in Memory/"
-    kc_log "  3. agent-knowledge doctor --project $TARGET_PROJECT"
 fi

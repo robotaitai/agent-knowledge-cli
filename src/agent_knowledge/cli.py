@@ -99,6 +99,15 @@ def init(
                 for action in actions:
                     click.echo(action, err=True)
 
+    # Auto-import repo history into Evidence/
+    if not dry_run:
+        import_args = ["--project", str(repo_path)]
+        if json_mode:
+            import_args.append("--json")
+        rc_import = run_bash_script("import-agent-history.sh", import_args)
+        if not json_mode and rc_import == 0:
+            click.echo("  Import: repo history indexed into Evidence/", err=True)
+
     # Lightweight history backfill — runs automatically for existing repos
     if not dry_run:
         from agent_knowledge.runtime.history import run_backfill
@@ -120,12 +129,14 @@ def init(
 
     if not json_mode:
         prompt = "Read AGENTS.md and ./agent-knowledge/STATUS.md, then onboard this project."
-        border = "+" + "-" * (len(prompt) + 2) + "+"
-        click.echo("", err=True)
-        click.secho("Ready. Open your agent and send:", bold=True, err=True)
+        header = "Paste in your agent chat:"
+        width = max(len(prompt), len(header)) + 2
+        border = "+" + "-" * width + "+"
         click.echo("", err=True)
         click.secho(border, fg="cyan", err=True)
-        click.secho(f"| {prompt} |", fg="cyan", bold=True, err=True)
+        click.secho(f"| {header:<{width - 2}} |", fg="cyan", err=True)
+        click.secho(border, fg="cyan", err=True)
+        click.secho(f"  {prompt}", bold=True, err=True)
         click.secho(border, fg="cyan", err=True)
         click.echo("", err=True)
 
