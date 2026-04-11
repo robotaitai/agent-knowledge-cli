@@ -8,24 +8,22 @@ just markdown files and a CLI.
 
 ## Install
 
-```
+```bash
 pip install agent-knowledge-cli
 ```
 
-This installs the `agent-knowledge` command. PyPI package name is `agent-knowledge-cli`;
-the CLI command and all documentation refer to it as `agent-knowledge`.
+PyPI package name: `agent-knowledge-cli`. CLI command and all docs: `agent-knowledge`.
 
 ## Quick Start
 
 ```bash
-pip install agent-knowledge-cli
 cd your-project
 agent-knowledge init
 ```
 
-Open Cursor in the repo — the agent picks up from there automatically.
+Open Cursor — the agent picks up from there automatically.
 
-`init` installs everything needed in the project:
+`init` does everything in one shot:
 - infers the project slug from the directory name
 - creates an external knowledge vault at `~/agent-os/projects/<slug>/`
 - symlinks `./agent-knowledge` into the repo as the local handle
@@ -34,7 +32,8 @@ Open Cursor in the repo — the agent picks up from there automatically.
 - installs `.cursor/commands/memory-update.md` and `system-update.md` — slash commands
 - detects Claude and Codex and installs their bridge files if present
 - bootstraps the memory tree and marks onboarding as `pending`
-- backfills lightweight history from git (if existing repo)
+- imports repo history into `Evidence/` automatically
+- backfills lightweight history from git
 
 ## How It Works
 
@@ -42,6 +41,10 @@ Open Cursor in the repo — the agent picks up from there automatically.
 your-project/
   .agent-project.yaml        # project config
   AGENTS.md                   # instructions agents read on startup
+  .cursor/
+    rules/agent-knowledge.mdc # always-on memory contract
+    hooks.json                 # session lifecycle hooks
+    commands/                  # /memory-update, /system-update slash commands
   agent-knowledge/            # symlink -> ~/agent-os/projects/<slug>/
     STATUS.md                 # onboarding state + sync timestamps
     Memory/                   # curated, durable knowledge (source of truth)
@@ -49,6 +52,9 @@ your-project/
       stack.md
       decisions/
         decisions.md
+    History/                  # lightweight diary (what happened over time)
+      events.ndjson
+      history.md
     Evidence/                 # imported or extracted material (not canonical)
       raw/
       imports/
@@ -56,7 +62,7 @@ your-project/
     Outputs/                  # generated views (never canonical)
       knowledge-index.json
       knowledge-index.md
-      knowledge-export.html
+      site/
     Sessions/                 # ephemeral session state
 ```
 
@@ -67,13 +73,14 @@ and clones. The symlink gives every tool a stable `./agent-knowledge` path.
 
 | Folder | Role | Canonical? |
 |--------|------|-----------|
-| `Memory/` | Curated, durable facts -- source of truth | Yes |
+| `Memory/` | Curated, durable facts — source of truth | Yes |
+| `History/` | What happened over time — lightweight diary | Yes (diary) |
 | `Evidence/` | Imported/extracted material, event stream | No |
 | `Outputs/` | Generated views, indexes, HTML export | No |
 | `Sessions/` | Ephemeral session state, prune aggressively | No |
 
 Evidence is never auto-promoted into Memory. Outputs are never treated as truth.
-Only agents and humans deliberately write to Memory.
+Only agents and humans deliberately write to Memory or History.
 
 ### Automatic capture
 
@@ -96,7 +103,48 @@ on every sync. It provides a compact catalog of all notes so agents can:
 Use `agent-knowledge search <query>` to run a quick Layer 2 shortlist query
 from the command line or a hook.
 
-#
+## Cursor-first runtime
+
+Cursor is the primary supported runtime path. The project carries everything
+it needs — opening the repo in Cursor is enough to get automatic behavior:
+
+| What is installed | What it does |
+|------------------|-------------|
+| `.cursor/rules/agent-knowledge.mdc` | Always-on rule: loads memory context on every session |
+| `.cursor/hooks.json` | Lifecycle hooks: sync on start, update on write, sync on stop and pre-compact |
+| `.cursor/commands/memory-update.md` | `/memory-update` slash command |
+| `.cursor/commands/system-update.md` | `/system-update` slash command |
+
+### Session lifecycle
+
+When you open the project in Cursor, the hooks fire automatically:
+
+- **session-start** — runs `agent-knowledge sync` to load fresh vault state
+- **post-write** — runs `agent-knowledge update` after each file save
+- **stop** — runs `agent-knowledge sync` at end of each task
+- **preCompact** — runs `agent-knowledge sync` before context compaction
+
+The rule ensures the agent reads `STATUS.md` and `Memory/MEMORY.md` at the
+start of every session, with no manual prompting required.
+
+### Slash commands
+
+Inside any Cursor session in this project:
+
+- `/memory-update` — sync, review session work, write stable facts to `Memory/`, summarize
+- `/system-update` — refresh integration files to the latest framework version
+
+These are project-local. They work because `init` installed them in `.cursor/commands/`.
+
+### Integration health
+
+```bash
+agent-knowledge doctor
+```
+
+Reports whether rules, hooks, and commands are all installed and current.
+If any file is stale or missing, `doctor` suggests `agent-knowledge refresh-system`.
+
 ## Commands
 
 | Command | What it does |
@@ -221,48 +269,6 @@ agent-knowledge export-canvas
 
 All Obsidian-specific features are optional. The system works fully without Obsidian.
 
-## Cursor-first runtime
-
-Cursor is the primary supported runtime path. The project carries everything
-it needs — opening the repo in Cursor is enough to get automatic behavior:
-
-| What is installed | What it does |
-|------------------|-------------|
-| `.cursor/rules/agent-knowledge.mdc` | Always-on rule: loads memory context on every session |
-| `.cursor/hooks.json` | Lifecycle hooks: sync on start, update on write, sync on stop and pre-compact |
-| `.cursor/commands/memory-update.md` | `/memory-update` slash command |
-| `.cursor/commands/system-update.md` | `/system-update` slash command |
-
-### Session lifecycle
-
-When you open the project in Cursor, the hooks fire automatically:
-
-- **session-start** — runs `agent-knowledge sync` to load fresh vault state
-- **post-write** — runs `agent-knowledge update` after each file save
-- **stop** — runs `agent-knowledge sync` at end of each task
-- **preCompact** — runs `agent-knowledge sync` before context compaction
-
-The rule ensures the agent reads `STATUS.md` and `Memory/MEMORY.md` at the
-start of every session, with no manual prompting required.
-
-### Slash commands
-
-Inside any Cursor session in this project:
-
-- `/memory-update` — triggers a guided memory update flow: sync, review session work, write stable facts to `Memory/`, summarize
-- `/system-update` — refreshes the project's integration files to the latest framework version
-
-These are project-local commands. They work because `init` installed them in `.cursor/commands/`.
-
-### Checking integration health
-
-```bash
-agent-knowledge doctor
-```
-
-Reports whether rules, hooks, and commands are all installed and current. If any
-integration file is stale, `doctor` suggests `agent-knowledge refresh-system`.
-
 ## Multi-Tool Support
 
 `init` always installs Cursor integration. Claude and Codex are installed when detected:
@@ -344,6 +350,7 @@ Common issues:
 - Onboarding still pending: paste the init prompt into your agent
 - Stale index: run `agent-knowledge index` or `agent-knowledge sync`
 - Large notes: run `agent-knowledge compact`
+- **Wrong binary**: another tool (e.g. graphify) may install a Node.js `agent-knowledge` that shadows ours. Check with `which -a agent-knowledge`. Fix: add the Python bin to PATH before nvm — `export PATH="$(python3 -c 'import sysconfig; print(sysconfig.get_path("scripts"))'):$PATH"` — or invoke directly: `python3 -m agent_knowledge`
 
 ## Platform Support
 
