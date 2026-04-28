@@ -208,6 +208,8 @@ Each project's `./agent-knowledge/` is a valid **Obsidian vault** on its own. Bu
 
 One window. Every team.
 
+<img src="docs/obsidian-graph.gif" width="100%" alt="Obsidian graph view" />
+
 ```bash
 bedrock export-canvas
 # produces: agent-knowledge/Outputs/knowledge-export.canvas
