@@ -2,6 +2,8 @@
 
 # agent-knowledge: Shared Memory for AI Development Teams
 
+### Tell your AI developers how to work, and every session leaves the project smarter.
+
 robotaitai
 
 [![PyPI](https://img.shields.io/pypi/v/agent-knowledge-cli?color=blue&label=PyPI)](https://pypi.org/project/agent-knowledge-cli/)
@@ -16,27 +18,33 @@ robotaitai
 
 ---
 
-If you manage a team -- humans, AI agents, or both -- you already know the real
-problem isn't writing code. It's making sure that what one developer changed,
-decided, or learned today is still visible to the rest of the team next week.
-Decisions get lost in chat history. Context evaporates between sessions. New
-teammates start from zero. Senior knowledge becomes a tax on the senior.
+AI can write code fast.
 
-`agent-knowledge` is a structured logbook that every developer on your team --
-human or AI -- reads at the start of their session and updates at the end. No
-chasing people for status updates, no archaeology in old PRs, no "ask the
-senior dev". The next developer (or the next session) opens the project and
-already knows what was done, where, and why.
+What it does **not** do well by default is leave behind clear, shared project understanding.
 
-It is designed for the manager who wants their team to leave a trail behind
-them, without inventing yet another tool to ignore. It works with **Claude
-Code**, **Cursor**, and **Codex** out of the box -- one command and every
-session is wired to read and write the team's shared memory automatically.
+Decisions disappear into chat history.  
+Architecture gets rediscovered.  
+New sessions start from zero.  
+And the next developer, human or AI, has to figure out again what changed, where, and why.
 
-Under the hood it's just markdown files and a CLI. No database, no server,
-nothing to host. The vault lives in your repo, travels with your code, and
-diffs cleanly in git so reviewing what your team learned this week is just a
-PR review.
+**agent-knowledge** gives every repo a shared memory layer for humans and AI developers.
+
+It works like the operating discipline of a strong team lead:
+- every session starts with context
+- every important change leaves a trail
+- stable knowledge gets written down where the next developer can find it
+- the project becomes easier to understand over time, not harder
+
+With one command, your project gets:
+- structured memory for architecture, decisions, conventions, and history
+- project-local integration for **Claude Code** and **Cursor**
+- lightweight git-friendly markdown that lives with the repo
+- HTML, graph, and Obsidian-ready views of what the project knows
+
+Under the hood, it is just markdown files and a CLI.  
+No database. No server. No hosted backend. No black box.
+
+**The result:** your AI developers stop behaving like disconnected sessions, and start behaving more like a team.
 
 ## Install
 
@@ -216,130 +224,18 @@ Other commands: `absorb`, `search`, `export-html`, `clean-import`, `refresh-syst
 
 All write commands support `--dry-run` and `--json`.
 
-## Static site export
+## More
 
-Build a polished standalone site from your knowledge vault -- no Obsidian required:
-
-```bash
-agent-knowledge export-html       # generate
-agent-knowledge view              # generate and open in browser
-```
-
-The generated site includes an overview page, branch tree navigation, note detail
-view, evidence view, interactive graph view, and machine-readable `knowledge.json`
-and `graph.json`. Opens via `file://` with no server needed.
-
-Memory/ notes are always primary. Evidence and Outputs items are clearly marked
-non-canonical.
-
-## Automatic capture
-
-Every sync and update event is automatically recorded in `Evidence/captures/`
-as a small structured YAML file. This gives a lightweight history of what
-changed and when -- without a database or background service.
-
-Captures are evidence, not memory. They accumulate quietly and can be pruned
-with `agent-knowledge compact`.
-
-## Progressive retrieval
-
-The knowledge index (`Outputs/knowledge-index.json` and `.md`) is regenerated
-on every sync. Agents can:
-
-1. Load the index first (cheap, a few KB)
-2. Identify relevant branches from the shortlist
-3. Load only the full note content they actually need
-
-Use `agent-knowledge search <query>` for a quick shortlist query from the
-command line or a hook.
-
-## Clean web import
-
-Import a web page as cleaned, non-canonical evidence:
-
-```bash
-agent-knowledge clean-import https://docs.example.com/api-reference
-# produces: agent-knowledge/Evidence/imports/2025-01-15-api-reference.md
-```
-
-Strips navigation, ads, scripts, and boilerplate. Writes clean markdown with
-YAML frontmatter marking it as non-canonical.
-
-## Project history
-
-`init` automatically backfills a lightweight history layer when run on an existing repo.
-You can also run it explicitly:
-
-```bash
-agent-knowledge backfill-history
-```
-
-Creates `History/events.ndjson` (append-only event log), `History/history.md`
-(human-readable summary), and `History/timeline/` (sparse milestone notes).
-
-History records what happened over time -- releases, integrations, sync events.
-It is not a git replacement. Current truth lives in `Memory/`.
-
-## Keeping up to date
-
-```bash
-pip install -U agent-knowledge-cli
-agent-knowledge refresh-system
-```
-
-`refresh-system` updates all integration files -- Claude settings/commands/contract,
-Cursor hooks/rules/commands, `AGENTS.md` header, Codex config -- and version markers.
-It never touches `Memory/`, `Evidence/`, or any curated knowledge.
-
-`doctor` warns when the project integration is behind the installed version.
-
-## Custom knowledge home
-
-```bash
-export AGENT_KNOWLEDGE_HOME=~/my-knowledge
-agent-knowledge init
-```
-
-## Troubleshooting
-
-```bash
-agent-knowledge doctor          # validate setup and report health
-agent-knowledge doctor --json   # machine-readable health check
-```
-
-Common issues:
-- `./agent-knowledge` missing: run `agent-knowledge init` (or `agent-knowledge init --external` to keep knowledge outside the repo)
-- Project still on external mode: run `agent-knowledge migrate-to-local` to switch the vault into the repo
-- Onboarding still pending: paste the init prompt into your agent
-- Claude not picking up memory: check `.claude/settings.json` exists -- run `agent-knowledge refresh-system`
-- Cursor hooks not firing: check `.cursor/hooks.json` exists -- run `agent-knowledge refresh-system`
-- Stale index: run `agent-knowledge sync`
-- Large notes: run `agent-knowledge compact`
-- **Wrong binary**: another tool may install a Node.js `agent-knowledge` that shadows ours. Check with `which -a agent-knowledge`. Fix: `export PATH="$(python3 -c 'import sysconfig; print(sysconfig.get_path("scripts"))'):$PATH"`
-
-## Platform support
-
-- **macOS** and **Linux** are fully supported.
-- **Windows** is not currently supported (relies on `bash` and POSIX shell scripts).
-- Python 3.9+ required.
-
-## Package naming
-
-| What | Value |
-|------|-------|
-| PyPI package | `agent-knowledge-cli` |
-| CLI command | `agent-knowledge` |
-| Python import | `agent_knowledge` |
-
-## Development
-
-```bash
-git clone <repo-url>
-cd agent-knowledge
-python3 -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-python -m pytest tests/ -q
-```
+- [Static site export](docs/reference.md#static-site-export) -- `agent-knowledge view` builds an interactive HTML site from your vault
+- [Automatic capture](docs/reference.md#automatic-capture) -- every sync event is recorded as lightweight evidence
+- [Progressive retrieval](docs/reference.md#progressive-retrieval) -- agents load only the branches they need
+- [Clean web import](docs/reference.md#clean-web-import) -- import a URL as cleaned markdown evidence
+- [Project history](docs/reference.md#project-history) -- lightweight event log auto-backfilled from git
+- [Keeping up to date](docs/reference.md#keeping-up-to-date) -- `pip install -U` + `refresh-system`
+- [Custom knowledge home](docs/reference.md#custom-knowledge-home) -- change where `~/agent-os/` lives
+- [Troubleshooting](docs/reference.md#troubleshooting) -- common issues and fixes
+- [Platform support](docs/reference.md#platform-support) -- macOS, Linux, Python 3.9+
+- [Development](docs/reference.md#development) -- contributing and running tests
 
 ## Star History
 
