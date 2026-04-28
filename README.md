@@ -331,3 +331,7 @@ python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
 python -m pytest tests/ -q
 ```
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=robotaitai/agent-knowledge-cli&type=Date)](https://star-history.com/#robotaitai/agent-knowledge-cli&Date)
