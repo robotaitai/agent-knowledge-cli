@@ -1,8 +1,22 @@
-    # agent-knowledge
+<div align="center">
 
-**Project memory for teams whose developers happen to be AI agents.**
+# agent-knowledge: Shared Memory for AI Development Teams
 
-If you manage a team - humans, AI agents, or both - you already know the real
+robotaitai
+
+[![PyPI](https://img.shields.io/pypi/v/agent-knowledge-cli?color=blue&label=PyPI)](https://pypi.org/project/agent-knowledge-cli/)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-ready-orange)](https://docs.anthropic.com/en/docs/claude-code)
+[![Cursor](https://img.shields.io/badge/Cursor-ready-purple)](https://cursor.sh)
+[![Codex](https://img.shields.io/badge/Codex-ready-black)](https://openai.com/codex)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+
+<img src="docs/agent-knowledge-tour.gif" width="100%" alt="agent-knowledge tour" />
+
+</div>
+
+---
+
+If you manage a team -- humans, AI agents, or both -- you already know the real
 problem isn't writing code. It's making sure that what one developer changed,
 decided, or learned today is still visible to the rest of the team next week.
 Decisions get lost in chat history. Context evaporates between sessions. New
@@ -23,8 +37,6 @@ Under the hood it's just markdown files and a CLI. No database, no server,
 nothing to host. The vault lives in your repo, travels with your code, and
 diffs cleanly in git so reviewing what your team learned this week is just a
 PR review.
-
-<img src="docs/agent-knowledge-tour.gif" width="100%" alt="agent-knowledge tour" />
 
 ## Install
 
@@ -47,7 +59,7 @@ persistent memory automatically -- no manual prompting, no config, no setup.
 `init` does everything in one shot:
 - creates `./agent-knowledge/` as a real directory inside the repo (git-tracked)
 - registers the project in `~/agent-os/projects/<slug>/` as a symlink back into the repo, so **every project on your machine shows up in one place** -- open `~/agent-os/projects/` in Obsidian and you have a single vault that spans all your teams' logbooks
-- adds noisy subfolders (`Evidence/raw/`, `Sessions/`, `Outputs/site/`, ...) to `.gitignore` automatically
+- adds noisy subfolders (`Evidence/raw/`, `Outputs/site/`, ...) to `.gitignore` automatically
 - installs project-local integration for both Claude Code and Cursor
 - detects Codex and installs its bridge files if present
 - bootstraps the memory tree and marks onboarding as `pending`
@@ -90,7 +102,6 @@ just chatter.
 | `History/` | What happened, and when -- a dated trail of releases and milestones | The CLI (auto, from git) | Yes |
 | `Evidence/` | Raw imports: docs, ADRs, PRs, screenshots, anything captured for context | Auto-imported on sync | No |
 | `Outputs/` | Generated views: HTML site, search index, knowledge map | The CLI (auto) | No |
-| `Sessions/` | Scratch state from the current session -- pruned aggressively | The CLI (auto) | No |
 
 The discipline that makes this work: **only `Memory/` and `History/` are canon.**
 Nothing imported, captured, or generated is ever treated as truth on its own.
@@ -113,8 +124,6 @@ Obsidian and you have **a unified vault across all your teams' projects** --
 with backlinks, graph view, and full-text search spanning every codebase you
 manage. No per-project Obsidian setup. No re-opening windows when you switch
 contexts. One window, every team.
-
-![Obsidian graph view of a project knowledge vault](docs/obsidian-graph.png)
 
 For a spatial canvas of the knowledge graph:
 
@@ -156,7 +165,7 @@ branch-note convention, internal links. But everything works without it too.
 
 ### Session lifecycle
 
-Hooks fire automatically -- the agent syncs memory at the start of every session    
+Hooks fire automatically -- the agent syncs memory at the start of every session
 and captures state at the end, with no manual intervention:
 
 | Event | Claude Code | Cursor | What runs |
@@ -205,7 +214,7 @@ missing, `doctor` tells you exactly what to run.
 
 Other commands: `absorb`, `search`, `export-html`, `clean-import`, `refresh-system`, `backfill-history`, `compact`, `migrate-to-local`, `init --external`. Run `agent-knowledge --help` for the full list.
 
-All write commands support `--dry-run` and `--json`. Run `agent-knowledge --help` for the full list.
+All write commands support `--dry-run` and `--json`.
 
 ## Static site export
 
@@ -280,7 +289,7 @@ agent-knowledge refresh-system
 
 `refresh-system` updates all integration files -- Claude settings/commands/contract,
 Cursor hooks/rules/commands, `AGENTS.md` header, Codex config -- and version markers.
-It never touches `Memory/`, `Evidence/`, `Sessions/`, or any curated knowledge.
+It never touches `Memory/`, `Evidence/`, or any curated knowledge.
 
 `doctor` warns when the project integration is behind the installed version.
 
