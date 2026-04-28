@@ -46,106 +46,87 @@ No database. No server. No hosted backend. No black box.
 
 **The result:** your AI developers stop behaving like disconnected sessions, and start behaving more like a team.
 
-## Install
+## 📦 Install
 
 ```bash
 pip install agent-knowledge-cli
 ```
 
-PyPI package name: `agent-knowledge-cli`. CLI command and all docs: `agent-knowledge`.
+> **PyPI:** `agent-knowledge-cli` &nbsp;&middot;&nbsp; **CLI:** `agent-knowledge`
 
-## Quick Start
+---
+
+## 🚀 Quick Start
 
 ```bash
 cd your-project
 agent-knowledge init
 ```
 
-That's it. Open the project in Claude Code or Cursor and the agent has
-persistent memory automatically -- no manual prompting, no config, no setup.
+**That's it.** Open the project in Claude Code or Cursor and the agent has persistent memory automatically -- no manual prompting, no config, no setup.
 
-`init` does everything in one shot:
-- creates `./agent-knowledge/` as a real directory inside the repo (git-tracked)
-- registers the project in `~/agent-os/projects/<slug>/` as a symlink back into the repo, so **every project on your machine shows up in one place** -- open `~/agent-os/projects/` in Obsidian and you have a single vault that spans all your teams' logbooks
-- adds noisy subfolders (`Evidence/raw/`, `Outputs/site/`, ...) to `.gitignore` automatically
-- installs project-local integration for both Claude Code and Cursor
-- detects Codex and installs its bridge files if present
-- bootstraps the memory tree and marks onboarding as `pending`
-- imports repo history into `Evidence/` and backfills lightweight history from git
+<details>
+<summary><b>What <code>init</code> does in one shot</b></summary>
 
-## Storage modes
+<br>
 
-By default, knowledge lives **inside** the repo at `./agent-knowledge/` (git-tracked) and
-`~/agent-os/projects/<slug>/` is a symlink back to it. Curated knowledge (`Memory/`,
-`History/`, `Evidence/imports/`) is committed normally; noisy subfolders are gitignored.
+| Step | What happens |
+|------|-------------|
+| 1 | Creates `./agent-knowledge/` as a **real directory** inside the repo (git-tracked) |
+| 2 | Registers the project in `~/agent-os/projects/<slug>/` so **every project shows up in one place** -- open it in Obsidian for a unified cross-project vault |
+| 3 | Adds noisy subfolders (`Evidence/raw/`, `Outputs/site/`, ...) to `.gitignore` automatically |
+| 4 | Installs project-local integration for **Claude Code** and **Cursor** |
+| 5 | Detects **Codex** and installs its bridge files if present |
+| 6 | Bootstraps the memory tree and marks onboarding as `pending` |
+| 7 | Imports repo history into `Evidence/` and backfills lightweight history from git |
 
-To keep knowledge **outside** the repo instead:
+</details>
+
+---
+
+## 💾 Storage Modes
+
+By default, knowledge lives **inside** the repo (git-tracked).
+Curated knowledge is committed normally; noisy subfolders are gitignored.
 
 ```bash
+# Default: in-repo (recommended)
+agent-knowledge init
+
+# External: knowledge outside the repo (not committed)
 agent-knowledge init --external
-```
 
-In external mode:
-- Knowledge lives in `~/agent-os/projects/<slug>/` (not committed)
-- `./agent-knowledge` is a symlink into that folder
-
-To convert an existing external-vault project to in-repo:
-
-```bash
+# Convert external -> in-repo later
 agent-knowledge migrate-to-local
 ```
 
-## How It Works
+---
 
-Think of the vault as your team's shared notebook. It has a few clearly
-separated sections so a casual scribble doesn't get mistaken for a confirmed
-fact, and so the manager (you) can tell at a glance what is canon vs. what is
-just chatter.
+## 🧠 How It Works
 
-### Knowledge layers
+Think of the vault as your team's **shared notebook**. Casual scribbles don't get mistaken for confirmed facts, and you can always tell what is canon vs. chatter.
 
-| Folder | Role | Who writes here | Canonical? |
-|--------|------|-----------------|-----------|
-| `Memory/` | Decisions, conventions, architecture, gotchas -- the things you'd tell a new hire | Developer (deliberately, at session end) | Yes |
-| `History/` | What happened, and when -- a dated trail of releases and milestones | The CLI (auto, from git) | Yes |
-| `Evidence/` | Raw imports: docs, ADRs, PRs, screenshots, anything captured for context | Auto-imported on sync | No |
-| `Outputs/` | Generated views: HTML site, search index, knowledge map | The CLI (auto) | No |
+### Knowledge Layers
 
-The discipline that makes this work: **only `Memory/` and `History/` are canon.**
-Nothing imported, captured, or generated is ever treated as truth on its own.
-A developer (or AI agent) has to consciously promote something into `Memory/`
-for it to count -- which is exactly what you'd want from any team member
-writing to a shared logbook.
+| | Folder | What goes here | Canon? |
+|---|--------|---------------|:------:|
+| 📘 | **`Memory/`** | Decisions, conventions, architecture, gotchas -- what you'd tell a new hire | **Yes** |
+| 📅 | **`History/`** | What happened and when -- releases, milestones, a dated trail | **Yes** |
+| 📎 | `Evidence/` | Raw imports: docs, ADRs, PRs, screenshots -- captured context | No |
+| 📊 | `Outputs/` | Generated views: HTML site, search index, knowledge map | No |
 
-## Project-local integration
+> **The rule:** only `Memory/` and `History/` are truth. Nothing imported, captured, or generated is ever treated as canon on its own. A developer has to consciously promote something into `Memory/` for it to count.
 
-The project carries everything it needs. Both Claude Code and Cursor get full
-integration installed automatically -- hooks, runtime contracts, and slash commands.
-No global config required.
+---
 
-## Obsidian-ready -- one vault for every project
+## 🔌 Project-Local Integration
 
-Each project's `./agent-knowledge/` is a valid Obsidian vault on its own. But
-the real payoff is `~/agent-os/projects/`: every project you've ever run
-`init` in is registered there as a symlink. Open that single folder in
-Obsidian and you have **a unified vault across all your teams' projects** --
-with backlinks, graph view, and full-text search spanning every codebase you
-manage. No per-project Obsidian setup. No re-opening windows when you switch
-contexts. One window, every team.
+The project carries **everything it needs**. Both Claude Code and Cursor get full integration installed automatically -- hooks, runtime contracts, and slash commands. No global config.
 
-For a spatial canvas of the knowledge graph:
+<details>
+<summary><b>Claude Code</b> &nbsp;<code>.claude/</code></summary>
 
-```bash
-agent-knowledge export-canvas
-# produces: agent-knowledge/Outputs/knowledge-export.canvas
-```
-
-The vault is designed to work well in Obsidian -- good markdown, YAML frontmatter,
-branch-note convention, internal links. But everything works without it too.
-
-### What gets installed
-
-**Claude Code** (`.claude/`):
+<br>
 
 | File | Purpose |
 |------|---------|
@@ -155,7 +136,12 @@ branch-note convention, internal links. But everything works without it too.
 | `commands/system-update.md` | `/system-update` slash command |
 | `commands/absorb.md` | `/absorb <file/folder>` slash command |
 
-**Cursor** (`.cursor/`):
+</details>
+
+<details>
+<summary><b>Cursor</b> &nbsp;<code>.cursor/</code></summary>
+
+<br>
 
 | File | Purpose |
 |------|---------|
@@ -165,64 +151,88 @@ branch-note convention, internal links. But everything works without it too.
 | `commands/system-update.md` | `/system-update` slash command |
 | `commands/absorb.md` | `/absorb <file/folder>` slash command |
 
-**Codex** (`.codex/`) -- installed when detected:
+</details>
+
+<details>
+<summary><b>Codex</b> &nbsp;<code>.codex/</code> &nbsp;(installed when detected)</summary>
+
+<br>
 
 | File | Purpose |
 |------|---------|
 | `AGENTS.md` | Agent contract with knowledge layer instructions |
 
-### Session lifecycle
+</details>
 
-Hooks fire automatically -- the agent syncs memory at the start of every session
-and captures state at the end, with no manual intervention:
+### ⚡ Session Lifecycle
+
+Hooks fire automatically -- **zero manual intervention:**
 
 | Event | Claude Code | Cursor | What runs |
-|-------|-------------|--------|-----------|
-| Session start | SessionStart | session-start | `agent-knowledge sync` |
-| File saved | -- | post-write | `agent-knowledge update` |
-| Task complete | Stop | stop | `agent-knowledge sync` |
-| Context compaction | PreCompact | preCompact | `agent-knowledge sync` |
+|-------|:-----------:|:------:|-----------|
+| Session start | `SessionStart` | `session-start` | `agent-knowledge sync` |
+| File saved | -- | `post-write` | `agent-knowledge update` |
+| Task complete | `Stop` | `stop` | `agent-knowledge sync` |
+| Context compaction | `PreCompact` | `preCompact` | `agent-knowledge sync` |
 
-The runtime contract ensures the agent reads `STATUS.md` and `Memory/MEMORY.md`
-at the start of every session, with no manual prompting required.
+The agent reads `STATUS.md` and `Memory/MEMORY.md` at the start of every session, with no prompting required.
 
-### Slash commands
+### 💬 Slash Commands
 
-These are how the team writes to the logbook. Both work in any Claude Code
-or Cursor session and are project-local -- `init` installed them.
+These are how the team writes to the logbook. Both work in Claude Code and Cursor -- `init` installed them.
 
-| Command | Who runs it | When | What it does |
-|---------|-------------|------|-------------|
-| `/memory-update` | The developer at the end of a session | Before logging off, before opening a PR | Syncs state, then the agent reviews what happened this session, writes confirmed stable facts into `Memory/`, and summarizes what changed. **This is the team handoff** -- whoever (or whatever) opens the project next will read it. |
-| `/system-update` | You, the manager | After upgrading `agent-knowledge-cli` | Refreshes the framework's plumbing: hooks, rules, commands, AGENTS.md. Has nothing to do with the project's knowledge content -- purely infrastructure. |
+| Command | When to use it |
+|---------|---------------|
+| **`/memory-update`** | End of session, before logging off. The agent reviews what happened, writes stable facts into `Memory/`, and summarizes changes. **This is the team handoff** -- the next developer (or session) gets it for free. |
+| **`/system-update`** | After upgrading `agent-knowledge-cli`. Refreshes hooks, rules, commands. Purely infrastructure -- never touches knowledge content. |
 
-The intent: a developer should never finish a session without running
-`/memory-update`. It is the equivalent of a daily standup writeup -- short,
-factual, and the next person on the team gets it for free.
+> A developer should never finish a session without running `/memory-update`. It's the equivalent of a daily standup writeup -- short, factual, and always there for the next person.
 
-### Integration health
+### 🩺 Integration Health
 
 ```bash
 agent-knowledge doctor
 ```
 
-Reports whether all integration files (settings, hooks, rules, commands) are
-installed and current for both Claude Code and Cursor. If anything is stale or
-missing, `doctor` tells you exactly what to run.
+Reports whether all integration files are installed and current. If anything is stale or missing, `doctor` tells you exactly what to run.
 
-## Commands
+---
+
+## 🔮 Obsidian-Ready
+
+Each project's `./agent-knowledge/` is a valid **Obsidian vault** on its own. But the real payoff is `~/agent-os/projects/`: every project you've ever run `init` in is registered there. Open that folder in Obsidian and you have **a unified vault across all your teams' projects** -- backlinks, graph view, and full-text search spanning every codebase you manage.
+
+One window. Every team.
+
+```bash
+agent-knowledge export-canvas
+# produces: agent-knowledge/Outputs/knowledge-export.canvas
+```
+
+Works great with Obsidian. Works without it too.
+
+---
+
+## 🛠️ Commands
 
 | Command | What it does |
 |---------|-------------|
-| `init` | Set up a project -- knowledge in-repo by default, one command, no arguments |
+| `init` | Set up a project -- one command, no arguments |
 | `sync` | Full sync: memory, history, git evidence, index |
 | `ship` | Validate + sync + commit + push |
 | `view` | Build site and open in browser |
 | `doctor` | Validate setup, integration health, note staleness |
 
-Other commands: `absorb`, `search`, `export-html`, `clean-import`, `refresh-system`, `backfill-history`, `compact`, `migrate-to-local`, `init --external`. Run `agent-knowledge --help` for the full list.
+<details>
+<summary><b>All commands</b></summary>
 
-All write commands support `--dry-run` and `--json`.
+<br>
+
+`absorb` &middot; `search` &middot; `export-html` &middot; `export-canvas` &middot; `clean-import` &middot; `refresh-system` &middot; `backfill-history` &middot; `compact` &middot; `migrate-to-local` &middot; `init --external`
+
+All write commands support `--dry-run` and `--json`. Run `agent-knowledge --help` for the full list.
+
+</details>
 
 ## More
 
