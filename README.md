@@ -16,7 +16,7 @@ robotaitai
 [![Codex](https://img.shields.io/badge/Codex-ready-black)](https://openai.com/codex) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE) 
 
-<img src="docs/agent-knowledge-tour.gif" width="100%" alt="agent-knowledge tour" />
+<video src="docs/demo.webm" width="100%" autoplay loop muted playsinline></video>
 
 </div>
 
