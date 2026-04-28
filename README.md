@@ -16,7 +16,7 @@ robotaitai
 [![Codex](https://img.shields.io/badge/Codex-ready-black)](https://openai.com/codex) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE) 
 
-<video src="docs/demo.webm" width="100%" autoplay loop muted playsinline></video>
+<img src="docs/demo.gif" width="100%" alt="project-bedrock demo" />
 
 </div>
 
