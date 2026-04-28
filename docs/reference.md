@@ -111,6 +111,22 @@ Common issues:
 - **Windows** is not currently supported (relies on `bash` and POSIX shell scripts).
 - Python 3.9+ required.
 
+## Migrating from agent-knowledge-cli
+
+If you previously used the `agent-knowledge-cli` PyPI package, migration is three steps:
+
+```bash
+pip uninstall agent-knowledge-cli   # remove old package
+pip install project-bedrock         # install new package
+bedrock migrate-from-legacy         # update this project's hooks and rules
+```
+
+`migrate-from-legacy` runs `refresh-system` internally — it updates `.cursor/hooks.json`,
+`settings.json`, rules, and command files so they call `bedrock` instead of `agent-knowledge`.
+
+The `agent-knowledge` command still works as a deprecated alias. It will be removed
+in a future release. Start using `bedrock` in scripts and habits now.
+
 ## Package naming
 
 | What | Value |

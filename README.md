@@ -246,6 +246,7 @@ All write commands support `--dry-run` and `--json`. Run `bedrock --help` for th
 - [Clean web import](docs/reference.md#clean-web-import) -- import a URL as cleaned markdown evidence
 - [Project history](docs/reference.md#project-history) -- lightweight event log auto-backfilled from git
 - [Keeping up to date](docs/reference.md#keeping-up-to-date) -- `pip install -U project-bedrock` + `bedrock refresh-system`
+- [Migrating from agent-knowledge-cli](docs/reference.md#migrating-from-agent-knowledge-cli) -- 3-step migration to `project-bedrock` and the `bedrock` CLI
 - [Custom knowledge home](docs/reference.md#custom-knowledge-home) -- change where `~/agent-os/` lives
 - [Troubleshooting](docs/reference.md#troubleshooting) -- common issues and fixes
 - [Platform support](docs/reference.md#platform-support) -- macOS, Linux, Python 3.9+

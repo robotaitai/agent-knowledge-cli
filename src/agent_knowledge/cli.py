@@ -1214,6 +1214,58 @@ def migrate_to_local(project: str, knowledge_home: str | None, dry_run: bool) ->
     click.echo("Commit agent-knowledge/ (excluding the patterns added to .gitignore).", err=True)
 
 
+@main.command(name="migrate-from-legacy")
+@click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root (default: cwd).")
+@click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
+def migrate_from_legacy(project: str, dry_run: bool) -> None:
+    """Migrate a project from agent-knowledge-cli to project-bedrock (bedrock CLI).
+
+    \b
+    What this does:
+      1. Runs refresh-system to update hooks, rules, and commands to use 'bedrock'.
+      2. Prints instructions to uninstall the old agent-knowledge-cli package.
+
+    \b
+    Full migration steps:
+      pip uninstall agent-knowledge-cli   # remove old PyPI package
+      pip install project-bedrock         # install new package (if not done yet)
+      bedrock migrate-from-legacy         # update this project's integration files
+    """
+    from agent_knowledge.runtime.refresh import run_refresh
+
+    repo_root = Path(project).resolve()
+    vault_dir = repo_root / "agent-knowledge"
+
+    if not vault_dir.is_dir():
+        click.secho(
+            "No agent-knowledge vault found. Run: bedrock init", fg="red", err=True
+        )
+        raise SystemExit(1)
+
+    click.echo("Migrating project from agent-knowledge-cli to project-bedrock...")
+    if dry_run:
+        click.echo("(dry-run mode -- no files will be changed)")
+
+    # Step 1: refresh-system updates hooks/rules/commands to use 'bedrock'
+    action = run_refresh(repo_root, dry_run=dry_run, json_mode=False)
+
+    if action == "up-to-date":
+        click.secho("Integration files already up to date.", fg="green")
+    else:
+        click.secho("Integration files refreshed.", fg="green")
+
+    # Step 2: print pip instructions
+    click.echo("")
+    click.echo("Project integration updated. Complete the migration:")
+    click.echo("")
+    click.echo("  pip uninstall agent-knowledge-cli   # remove old package")
+    click.echo("  # The bedrock and agent-knowledge commands now both come")
+    click.echo("  # from project-bedrock. The agent-knowledge alias is kept")
+    click.echo("  # for backward compatibility and will be removed in a future release.")
+    click.echo("")
+    click.secho("Migration complete.", fg="green")
+
+
 @main.command()
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
 def setup(dry_run: bool) -> None:
