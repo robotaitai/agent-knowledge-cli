@@ -1465,3 +1465,64 @@ def completion(shell: str | None, install: bool) -> None:
         click.echo(f"  {eval_line}", err=True)
         click.echo("", err=True)
         click.echo(f"Or run: bedrock completion --install", err=True)
+
+
+@main.command()
+@click.option("--yes", "-y", is_flag=True, help="Skip confirmation prompt.")
+@click.option("--check", is_flag=True, help="Only check for updates, do not install.")
+def upgrade(yes: bool, check: bool) -> None:
+    """Upgrade bedrock to the latest version from PyPI."""
+    import urllib.request
+    import json as _json
+
+    pypi_url = "https://pypi.org/pypi/project-bedrock/json"
+    click.echo(f"Current version: {__version__}", err=True)
+    click.echo("Checking PyPI...", err=True)
+
+    try:
+        with urllib.request.urlopen(pypi_url, timeout=10) as resp:
+            data = _json.loads(resp.read())
+        latest = data["info"]["version"]
+    except Exception as exc:
+        click.echo(f"Could not reach PyPI: {exc}", err=True)
+        raise SystemExit(1)
+
+    if latest == __version__:
+        click.echo(f"Already up to date ({__version__}).", err=True)
+        return
+
+    click.echo(f"New version available: {latest}", err=True)
+
+    if check:
+        return
+
+    # Detect installer: pipx wraps the executable inside a venv it manages
+    exe = Path(sys.executable)
+    in_pipx = "pipx" in str(exe) or "pipx" in os.environ.get("PIPX_HOME", "")
+    if not in_pipx:
+        # Also check if the bedrock script lives in a pipx bin dir
+        import shutil
+        bedrock_exe = shutil.which("bedrock") or ""
+        in_pipx = "pipx" in bedrock_exe
+
+    if in_pipx:
+        upgrade_cmd = ["pipx", "upgrade", "project-bedrock"]
+        installer = "pipx"
+    else:
+        upgrade_cmd = [sys.executable, "-m", "pip", "install", "--upgrade", "project-bedrock"]
+        installer = "pip"
+
+    if not yes:
+        click.confirm(
+            f"Upgrade to {latest} using {installer}?",
+            default=True,
+            abort=True,
+        )
+
+    result = subprocess.run(upgrade_cmd)
+    if result.returncode != 0:
+        click.echo("Upgrade failed.", err=True)
+        raise SystemExit(result.returncode)
+
+    click.echo("", err=True)
+    click.echo(f"Upgraded to {latest}. Run `bedrock refresh-system` to update project bridge files.", err=True)
