@@ -479,7 +479,7 @@ def ship(
 # -- global-sync ----------------------------------------------------------- #
 
 
-@main.command("global-sync")
+@main.command("global-sync", hidden=True)
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root.")
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
 @click.option("--json", "json_mode", is_flag=True, help="Output JSON only.")
@@ -493,7 +493,7 @@ def global_sync(project: str, dry_run: bool, json_mode: bool) -> None:
 # -- graphify-sync --------------------------------------------------------- #
 
 
-@main.command("graphify-sync")
+@main.command("graphify-sync", hidden=True)
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root.")
 @click.option("--source", default=None, help="Override source path for graph artifacts.")
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
@@ -531,6 +531,7 @@ def compact(project: str, dry_run: bool, json_mode: bool) -> None:
 
 @main.command(
     "measure-tokens",
+    hidden=True,
     context_settings={
         "ignore_unknown_options": True,
         "allow_extra_args": True,
@@ -801,7 +802,7 @@ def clean_import(
 # -- export-canvas --------------------------------------------------------- #
 
 
-@main.command("export-canvas")
+@main.command("export-canvas", hidden=True)
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root.")
 @click.option("--output", default=None, type=click.Path(), help="Output .canvas path (default: Outputs/knowledge-export.canvas).")
 @click.option("--dry-run", is_flag=True, help="Preview without writing.")
@@ -834,7 +835,7 @@ def export_canvas(project: str, output: str | None, dry_run: bool) -> None:
 # -- backfill-history ------------------------------------------------------ #
 
 
-@main.command("backfill-history")
+@main.command("backfill-history", hidden=True)
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root.")
 @click.option("--dry-run", is_flag=True, help="Preview what would be written without writing.")
 @click.option("--json", "json_mode", is_flag=True, help="Output JSON summary only.")
@@ -1105,7 +1106,7 @@ def _link(src: Path, dst: Path, label: str, dry_run: bool) -> None:
     click.echo(f"  linked: {label}", err=True)
 
 
-@main.command(name="migrate-to-local")
+@main.command(name="migrate-to-local", hidden=True)
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root (default: cwd).")
 @click.option("--knowledge-home", default=None, help="bedrock home for reversed symlink (default: ~/agent-os/projects).")
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
@@ -1214,7 +1215,7 @@ def migrate_to_local(project: str, knowledge_home: str | None, dry_run: bool) ->
     click.echo("Commit bedrock/ (excluding the patterns added to .gitignore).", err=True)
 
 
-@main.command(name="migrate-vault")
+@main.command(name="migrate-vault", hidden=True)
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root (default: cwd).")
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
 def migrate_vault(project: str, dry_run: bool) -> None:
@@ -1317,7 +1318,7 @@ def migrate_vault(project: str, dry_run: bool) -> None:
     click.echo("  4. git commit -m \"chore: migrate vault agent-knowledge -> bedrock\"", err=True)
 
 
-@main.command(name="migrate-from-legacy")
+@main.command(name="migrate-from-legacy", hidden=True)
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root (default: cwd).")
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
 def migrate_from_legacy(project: str, dry_run: bool) -> None:
@@ -1417,3 +1418,50 @@ def setup(dry_run: bool) -> None:
     click.echo("", err=True)
 
     click.echo("Done.", err=True)
+
+
+@main.command()
+@click.option("--shell", type=click.Choice(["bash", "zsh", "fish"]), default=None, help="Shell type (default: auto-detect).")
+@click.option("--install", is_flag=True, help="Write the eval line to your shell rc file automatically.")
+def completion(shell: str | None, install: bool) -> None:
+    """Enable tab completion for the bedrock CLI.
+
+    Run once, then restart your shell (or open a new tab).
+    """
+    import os
+
+    if shell is None:
+        shell_bin = os.environ.get("SHELL", "")
+        if "zsh" in shell_bin:
+            shell = "zsh"
+        elif "fish" in shell_bin:
+            shell = "fish"
+        else:
+            shell = "bash"
+
+    if shell == "zsh":
+        eval_line = 'eval "$(_BEDROCK_COMPLETE=zsh_source bedrock)"'
+        rc_file = Path.home() / ".zshrc"
+    elif shell == "fish":
+        eval_line = "_BEDROCK_COMPLETE=fish_source bedrock | source"
+        rc_file = Path.home() / ".config" / "fish" / "config.fish"
+    else:
+        eval_line = 'eval "$(_BEDROCK_COMPLETE=bash_source bedrock)"'
+        rc_file = Path.home() / ".bashrc"
+
+    sentinel = "# bedrock tab completion"
+
+    if install:
+        rc_text = rc_file.read_text() if rc_file.exists() else ""
+        if eval_line in rc_text:
+            click.echo(f"Already installed in {rc_file}", err=True)
+        else:
+            with rc_file.open("a") as f:
+                f.write(f"\n{sentinel}\n{eval_line}\n")
+            click.echo(f"Installed in {rc_file}. Restart your shell or run:", err=True)
+            click.echo(f"  source {rc_file}", err=True)
+    else:
+        click.echo(f"Add this line to {rc_file}:", err=True)
+        click.echo(f"  {eval_line}", err=True)
+        click.echo("", err=True)
+        click.echo(f"Or run: bedrock completion --install", err=True)
