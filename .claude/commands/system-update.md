@@ -1,4 +1,4 @@
-Refresh this project's agent-knowledge integration to the latest framework version.
+Refresh this project's bedrock integration to the latest framework version.
 
 Run in terminal:
 `bedrock refresh-system --project .`

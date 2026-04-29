@@ -29,4 +29,8 @@ All knowledge lives in `./bedrock/`.
 
 - Run `/system-update` to refresh integration files to the latest framework version
 
+## When the context window is getting long
+
+- Run `/compact-context` — saves memory, then resets the context window
+
 Keep ontology small and project-native. Do not force generic templates.

@@ -11,13 +11,13 @@ from .paths import get_assets_dir
 CURSOR_EXPECTED_HOOK_EVENTS = {"session-start", "post-write", "stop", "preCompact"}
 
 # Expected Cursor command files.
-CURSOR_EXPECTED_COMMANDS = {"memory-update.md", "system-update.md", "absorb.md"}
+CURSOR_EXPECTED_COMMANDS = {"memory-update.md", "system-update.md", "absorb.md", "compact-context.md"}
 
 # Expected Claude hook events — used by integration health checks.
 CLAUDE_EXPECTED_HOOK_EVENTS = {"SessionStart", "Stop", "PreCompact"}
 
 # Expected Claude command files.
-CLAUDE_EXPECTED_COMMANDS = {"memory-update.md", "system-update.md", "absorb.md"}
+CLAUDE_EXPECTED_COMMANDS = {"memory-update.md", "system-update.md", "absorb.md", "compact-context.md"}
 
 TOOLS = ("cursor", "claude", "codex")
 
@@ -78,6 +78,10 @@ All knowledge lives in `./bedrock/`.
 ## Periodic (every few sessions)
 
 - Run `/system-update` to refresh integration files to the latest framework version
+
+## When the context window is getting long
+
+- Run `/compact-context` — saves memory, then resets the context window
 
 Keep ontology small and project-native. Do not force generic templates.
 """
