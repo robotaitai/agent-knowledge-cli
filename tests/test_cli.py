@@ -91,7 +91,7 @@ def test_init_dry_run(tmp_path: Path):
         "--knowledge-home", str(tmp_path / "kh"),
         "--dry-run",
     )
-    assert not (repo / "agent-knowledge").exists()
+    assert not (repo / "bedrock").exists()
     assert not (repo / ".agent-project.yaml").exists()
 
 
@@ -100,8 +100,7 @@ def test_init_infers_slug_from_dirname(tmp_path: Path):
     kh = tmp_path / "kh"
     r = _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     assert r.returncode == 0, f"init failed: {r.stderr}"
-    assert (repo / "agent-knowledge").is_symlink()
-    assert (kh / "my-cool-project").is_dir()
+    assert (repo / "bedrock").is_dir()
 
 
 def test_init_zero_arg_from_cwd(tmp_path: Path):
@@ -115,7 +114,7 @@ def test_init_zero_arg_from_cwd(tmp_path: Path):
         cwd=str(repo),
     )
     assert r.returncode == 0, f"init failed: {r.stderr}"
-    assert (repo / "agent-knowledge").is_symlink()
+    assert (repo / "bedrock").is_dir()
     assert (repo / ".agent-project.yaml").is_file()
 
 
@@ -138,7 +137,7 @@ def test_init_installs_claude_integration(tmp_path: Path):
     assert (repo / ".claude" / "commands" / "memory-update.md").is_file()
     assert (repo / ".claude" / "commands" / "system-update.md").is_file()
     content = (repo / ".claude" / "CLAUDE.md").read_text()
-    assert "agent-knowledge" in content.lower()
+    assert "bedrock" in content.lower()
 
 
 def test_init_installs_codex_bridge_when_detected(tmp_path: Path):
@@ -169,7 +168,7 @@ def test_init_idempotent(tmp_path: Path):
     assert r1.returncode == 0
     r2 = _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     assert r2.returncode == 0
-    assert (repo / "agent-knowledge").is_symlink()
+    assert (repo / "bedrock").is_dir()
     assert (repo / ".agent-project.yaml").is_file()
     assert (repo / "AGENTS.md").is_file()
 
@@ -179,7 +178,7 @@ def test_init_sets_onboarding_pending(tmp_path: Path):
     kh = tmp_path / "kh"
     r = _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     assert r.returncode == 0
-    status = (repo / "agent-knowledge" / "STATUS.md").read_text()
+    status = (repo / "bedrock" / "STATUS.md").read_text()
     assert "onboarding: pending" in status
 
 
@@ -221,7 +220,7 @@ def test_smoke_init_doctor(tmp_path: Path):
     kh = tmp_path / "kh"
     r = _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     assert r.returncode == 0, f"init failed:\nstdout: {r.stdout}\nstderr: {r.stderr}"
-    assert (repo / "agent-knowledge").is_symlink()
+    assert (repo / "bedrock").is_dir()
     assert (repo / ".agent-project.yaml").is_file()
     assert (repo / "AGENTS.md").is_file()
 
@@ -270,7 +269,7 @@ def test_sync_copies_memory_branches(tmp_path: Path):
     r = _run("sync", "--project", str(repo))
     assert r.returncode == 0
 
-    vault_stack = repo / "agent-knowledge" / "Memory" / "stack.md"
+    vault_stack = repo / "bedrock" / "Memory" / "stack.md"
     assert vault_stack.is_file()
     assert "Python 3.9+" in vault_stack.read_text()
 
@@ -295,7 +294,7 @@ def test_sync_extracts_git_log(tmp_path: Path):
     r = _run("sync", "--project", str(repo))
     assert r.returncode == 0
 
-    git_evidence = repo / "agent-knowledge" / "Evidence" / "raw" / "git-recent.md"
+    git_evidence = repo / "bedrock" / "Evidence" / "raw" / "git-recent.md"
     assert git_evidence.is_file()
     assert "initial" in git_evidence.read_text()
 
@@ -322,12 +321,12 @@ def test_sync_updates_status_timestamp(tmp_path: Path):
     r = _run("sync", "--project", str(repo))
     assert r.returncode == 0
 
-    status = (repo / "agent-knowledge" / "STATUS.md").read_text()
-    # After sync, last_project_sync should have a timestamp (not empty)
+    status = (repo / "bedrock" / "STATUS.md").read_text()
+    # After sync, Last project sync body line should have a timestamp (not not-yet)
     import re
-    m = re.search(r"last_project_sync:\s*(\S+)", status)
-    assert m is not None, "last_project_sync should be stamped"
-    assert m.group(1) != ""
+    m = re.search(r"Last project sync.*?`([^`]+)`", status, re.IGNORECASE)
+    assert m is not None, "last_project_sync should be stamped in STATUS.md"
+    assert m.group(1) not in ("", "not-yet")
 
 
 # -- capture tests --------------------------------------------------------- #
@@ -342,7 +341,7 @@ def test_sync_creates_capture(tmp_path: Path):
     r = _run("sync", "--project", str(repo))
     assert r.returncode == 0
 
-    captures_dir = repo / "agent-knowledge" / "Evidence" / "captures"
+    captures_dir = repo / "bedrock" / "Evidence" / "captures"
     capture_files = list(captures_dir.glob("*.yaml"))
     assert len(capture_files) >= 1, "sync should create a capture file"
 
@@ -359,7 +358,7 @@ def test_capture_is_non_canonical(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("sync", "--project", str(repo))
 
-    memory_dir = repo / "agent-knowledge" / "Memory"
+    memory_dir = repo / "bedrock" / "Memory"
     captures_in_memory = list(memory_dir.rglob("*.yaml"))
     assert captures_in_memory == [], "No capture files should appear in Memory/"
 
@@ -371,7 +370,7 @@ def test_capture_idempotent(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("sync", "--project", str(repo))
 
-    captures_dir = repo / "agent-knowledge" / "Evidence" / "captures"
+    captures_dir = repo / "bedrock" / "Evidence" / "captures"
     count_after_first = len(list(captures_dir.glob("*.yaml")))
 
     _run("sync", "--project", str(repo))
@@ -391,7 +390,7 @@ def test_capture_dry_run_does_not_write(tmp_path: Path):
     r = _run("sync", "--project", str(repo), "--dry-run")
     assert r.returncode == 0
 
-    captures_dir = repo / "agent-knowledge" / "Evidence" / "captures"
+    captures_dir = repo / "bedrock" / "Evidence" / "captures"
     assert not any(captures_dir.glob("*.yaml")), "dry-run should not create capture files"
 
 
@@ -406,8 +405,8 @@ def test_sync_creates_knowledge_index(tmp_path: Path):
     r = _run("sync", "--project", str(repo))
     assert r.returncode == 0
 
-    index_json = repo / "agent-knowledge" / "Outputs" / "knowledge-index.json"
-    index_md = repo / "agent-knowledge" / "Outputs" / "knowledge-index.md"
+    index_json = repo / "bedrock" / "Outputs" / "knowledge-index.json"
+    index_md = repo / "bedrock" / "Outputs" / "knowledge-index.md"
     assert index_json.is_file(), "sync should produce knowledge-index.json"
     assert index_md.is_file(), "sync should produce knowledge-index.md"
 
@@ -425,7 +424,7 @@ def test_index_command(tmp_path: Path):
     r = _run("index", "--project", str(repo))
     assert r.returncode == 0
 
-    index_json = repo / "agent-knowledge" / "Outputs" / "knowledge-index.json"
+    index_json = repo / "bedrock" / "Outputs" / "knowledge-index.json"
     assert index_json.is_file()
 
 
@@ -436,7 +435,7 @@ def test_index_memory_first(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("sync", "--project", str(repo))
 
-    index_json = repo / "agent-knowledge" / "Outputs" / "knowledge-index.json"
+    index_json = repo / "bedrock" / "Outputs" / "knowledge-index.json"
     data = json.loads(index_json.read_text())
     notes = data["notes"]
 
@@ -458,7 +457,7 @@ def test_index_marks_outputs_non_canonical(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("sync", "--project", str(repo))
 
-    index_json = repo / "agent-knowledge" / "Outputs" / "knowledge-index.json"
+    index_json = repo / "bedrock" / "Outputs" / "knowledge-index.json"
     data = json.loads(index_json.read_text())
 
     for note in data["notes"]:
@@ -510,7 +509,7 @@ def test_export_html_creates_site(tmp_path: Path):
     r = _run("export-html", "--project", str(repo))
     assert r.returncode == 0, f"export-html failed: {r.stderr}"
 
-    site_dir = repo / "agent-knowledge" / "Outputs" / "site"
+    site_dir = repo / "bedrock" / "Outputs" / "site"
     assert site_dir.is_dir(), "Outputs/site/ must be created"
 
     index_html = site_dir / "index.html"
@@ -522,7 +521,7 @@ def test_export_html_creates_site(tmp_path: Path):
     # HTML sanity checks
     html = index_html.read_text()
     assert "<!DOCTYPE html>" in html
-    assert "agent-knowledge" in html.lower()
+    assert "bedrock" in html.lower()
     assert "Memory" in html
 
     # JSON structure checks
@@ -542,7 +541,7 @@ def test_export_html_dry_run(tmp_path: Path):
     r = _run("export-html", "--project", str(repo), "--dry-run")
     assert r.returncode == 0
 
-    site_dir = repo / "agent-knowledge" / "Outputs" / "site"
+    site_dir = repo / "bedrock" / "Outputs" / "site"
     assert not (site_dir / "index.html").exists(), "dry-run must not create index.html"
     assert not (site_dir / "data" / "knowledge.json").exists(), "dry-run must not create knowledge.json"
 
@@ -570,7 +569,7 @@ def test_export_html_non_canonical_distinction(tmp_path: Path):
     _run("sync", "--project", str(repo))
     _run("export-html", "--project", str(repo))
 
-    html = (repo / "agent-knowledge" / "Outputs" / "site" / "index.html").read_text()
+    html = (repo / "bedrock" / "Outputs" / "site" / "index.html").read_text()
     # CSS badge classes for canonical/non-canonical distinction
     assert "badge-Memory" in html
     assert "badge-Evidence" in html
@@ -618,7 +617,7 @@ def test_export_html_knowledge_json_structure(tmp_path: Path):
     _run("sync", "--project", str(repo))
     _run("export-html", "--project", str(repo))
 
-    kj = repo / "agent-knowledge" / "Outputs" / "site" / "data" / "knowledge.json"
+    kj = repo / "bedrock" / "Outputs" / "site" / "data" / "knowledge.json"
     data = json.loads(kj.read_text())
 
     # Required top-level keys
@@ -654,7 +653,7 @@ def test_export_html_memory_is_primary(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
     # Seed the vault with an evidence file
-    vault = repo / "agent-knowledge"
+    vault = repo / "bedrock"
     ev_dir = vault / "Evidence" / "imports"
     ev_dir.mkdir(parents=True, exist_ok=True)
     (ev_dir / "test-import.md").write_text(
@@ -663,7 +662,7 @@ def test_export_html_memory_is_primary(tmp_path: Path):
 
     _run("export-html", "--project", str(repo))
 
-    kj = repo / "agent-knowledge" / "Outputs" / "site" / "data" / "knowledge.json"
+    kj = repo / "bedrock" / "Outputs" / "site" / "data" / "knowledge.json"
     data = json.loads(kj.read_text())
 
     # Branches from Memory/ are canonical
@@ -673,18 +672,18 @@ def test_export_html_memory_is_primary(tmp_path: Path):
 
 
 def test_export_html_external_vault_pointer(tmp_path: Path):
-    """The site generator must work through the local ./agent-knowledge pointer."""
+    """The site generator must work through the local ./bedrock pointer."""
     repo = _init_repo(tmp_path, "html-pointer")
     kh = tmp_path / "kh"
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
     # The pointer should be a symlink (or the external dir on Windows)
-    pointer = repo / "agent-knowledge"
-    assert pointer.exists(), "./agent-knowledge pointer must exist"
+    pointer = repo / "bedrock"
+    assert pointer.exists(), "./bedrock pointer must exist"
 
     r = _run("export-html", "--project", str(repo))
     assert r.returncode == 0, f"export-html failed through pointer: {r.stderr}"
-    assert (repo / "agent-knowledge" / "Outputs" / "site" / "index.html").is_file()
+    assert (repo / "bedrock" / "Outputs" / "site" / "index.html").is_file()
 
 
 # -- graph tests ----------------------------------------------------------- #
@@ -698,7 +697,7 @@ def test_export_html_creates_graph_json(tmp_path: Path):
     _run("sync", "--project", str(repo))
     _run("export-html", "--project", str(repo))
 
-    graph_json = repo / "agent-knowledge" / "Outputs" / "site" / "data" / "graph.json"
+    graph_json = repo / "bedrock" / "Outputs" / "site" / "data" / "graph.json"
     assert graph_json.is_file(), "Outputs/site/data/graph.json must be created by export-html"
 
     data = json.loads(graph_json.read_text())
@@ -717,7 +716,7 @@ def test_graph_json_has_project_node(tmp_path: Path):
     _run("sync", "--project", str(repo))
     _run("export-html", "--project", str(repo))
 
-    gj = json.loads((repo / "agent-knowledge" / "Outputs" / "site" / "data" / "graph.json").read_text())
+    gj = json.loads((repo / "bedrock" / "Outputs" / "site" / "data" / "graph.json").read_text())
     project_nodes = [n for n in gj["nodes"] if n["type"] == "project"]
     assert len(project_nodes) >= 1, "graph.json must have at least one project node"
     project_node = project_nodes[0]
@@ -733,7 +732,7 @@ def test_graph_json_canonical_distinction(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
     # Seed an evidence file
-    ev_dir = repo / "agent-knowledge" / "Evidence" / "imports"
+    ev_dir = repo / "bedrock" / "Evidence" / "imports"
     ev_dir.mkdir(parents=True, exist_ok=True)
     (ev_dir / "external-ref.md").write_text(
         "---\nnote_type: evidence\nsource: https://example.com\n---\n\n# External Ref\n\nSome imported text.\n"
@@ -741,7 +740,7 @@ def test_graph_json_canonical_distinction(tmp_path: Path):
 
     _run("export-html", "--project", str(repo))
 
-    gj = json.loads((repo / "agent-knowledge" / "Outputs" / "site" / "data" / "graph.json").read_text())
+    gj = json.loads((repo / "bedrock" / "Outputs" / "site" / "data" / "graph.json").read_text())
 
     # All Memory/branch/note nodes must be canonical
     mem_types = {"project", "branch", "note", "decision"}
@@ -763,7 +762,7 @@ def test_graph_json_edges_have_required_fields(tmp_path: Path):
     _run("sync", "--project", str(repo))
     _run("export-html", "--project", str(repo))
 
-    gj = json.loads((repo / "agent-knowledge" / "Outputs" / "site" / "data" / "graph.json").read_text())
+    gj = json.loads((repo / "bedrock" / "Outputs" / "site" / "data" / "graph.json").read_text())
     for edge in gj["edges"]:
         assert "source" in edge, f"Edge missing 'source': {edge}"
         assert "target" in edge, f"Edge missing 'target': {edge}"
@@ -780,7 +779,7 @@ def test_graph_json_edges_reference_valid_nodes(tmp_path: Path):
     _run("sync", "--project", str(repo))
     _run("export-html", "--project", str(repo))
 
-    gj = json.loads((repo / "agent-knowledge" / "Outputs" / "site" / "data" / "graph.json").read_text())
+    gj = json.loads((repo / "bedrock" / "Outputs" / "site" / "data" / "graph.json").read_text())
     node_ids = {n["id"] for n in gj["nodes"]}
     for edge in gj["edges"]:
         assert edge["source"] in node_ids, f"Edge source {edge['source']} not in nodes"
@@ -795,7 +794,7 @@ def test_graph_view_in_site_html(tmp_path: Path):
     _run("sync", "--project", str(repo))
     _run("export-html", "--project", str(repo))
 
-    html = (repo / "agent-knowledge" / "Outputs" / "site" / "index.html").read_text()
+    html = (repo / "bedrock" / "Outputs" / "site" / "index.html").read_text()
 
     # Graph tab button in topbar
     assert 'data-view="graph"' in html, "Graph tab button must be present"
@@ -816,7 +815,7 @@ def test_graph_json_in_html_data(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("export-html", "--project", str(repo))
 
-    html = (repo / "agent-knowledge" / "Outputs" / "site" / "index.html").read_text()
+    html = (repo / "bedrock" / "Outputs" / "site" / "index.html").read_text()
 
     # Find and parse the embedded GRAPH_DATA constant
     m = re.search(r'const GRAPH_DATA\s*=\s*(\{.*?\});', html, re.DOTALL)
@@ -834,7 +833,7 @@ def test_graph_dry_run_no_graph_json(tmp_path: Path):
 
     _run("export-html", "--project", str(repo), "--dry-run")
 
-    graph_json = repo / "agent-knowledge" / "Outputs" / "site" / "data" / "graph.json"
+    graph_json = repo / "bedrock" / "Outputs" / "site" / "data" / "graph.json"
     assert not graph_json.exists(), "dry-run must not create graph.json"
 
 
@@ -891,10 +890,10 @@ def test_hooks_json_has_required_fields(tmp_path: Path):
     assert isinstance(data["hooks"], list)
     assert len(data["hooks"]) >= 1
 
-    # Hooks must reference agent-knowledge commands, not raw scripts
+    # Hooks must reference bedrock commands, not raw scripts
     for hook in data["hooks"]:
         cmd = hook.get("command", "")
-        assert "agent-knowledge" in cmd, f"Hook command should use CLI, not raw script: {cmd}"
+        assert "bedrock" in cmd, f"Hook command should use CLI, not raw script: {cmd}"
 
 
 # -- package naming test --------------------------------------------------- #
@@ -1019,7 +1018,7 @@ def test_clean_import_local_html(tmp_path: Path):
     )
     assert r.returncode == 0, f"clean-import failed: {r.stderr}"
 
-    imports_dir = repo / "agent-knowledge" / "Evidence" / "imports"
+    imports_dir = repo / "bedrock" / "Evidence" / "imports"
     # Exclude README.md created by bootstrap
     md_files = [f for f in imports_dir.glob("*.md") if f.name != "README.md"]
     assert len(md_files) >= 1, "clean-import should produce a .md file (besides README.md)"
@@ -1039,7 +1038,7 @@ def test_clean_import_strips_nav_from_memory(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("clean-import", str(html_file), "--project", str(repo))
 
-    memory_dir = repo / "agent-knowledge" / "Memory"
+    memory_dir = repo / "bedrock" / "Memory"
     imported_in_memory = list(memory_dir.rglob("*.md"))
     # MEMORY.md and decisions.md are created by init; no imports should appear there
     for f in imported_in_memory:
@@ -1060,7 +1059,7 @@ def test_clean_import_dry_run(tmp_path: Path):
     r = _run("clean-import", str(html_file), "--project", str(repo), "--dry-run")
     assert r.returncode == 0
 
-    imports_dir = repo / "agent-knowledge" / "Evidence" / "imports"
+    imports_dir = repo / "bedrock" / "Evidence" / "imports"
     # dry-run must not create any imported files (README.md from bootstrap is ok)
     non_readme = [f for f in imports_dir.glob("*.md") if f.name != "README.md"]
     assert not non_readme, "dry-run must not create any import files"
@@ -1094,7 +1093,7 @@ def test_export_canvas_creates_file(tmp_path: Path):
     r = _run("export-canvas", "--project", str(repo))
     assert r.returncode == 0
 
-    canvas_path = repo / "agent-knowledge" / "Outputs" / "knowledge-export.canvas"
+    canvas_path = repo / "bedrock" / "Outputs" / "knowledge-export.canvas"
     assert canvas_path.is_file(), "export-canvas should create knowledge-export.canvas"
 
     data = json.loads(canvas_path.read_text())
@@ -1113,7 +1112,7 @@ def test_export_canvas_dry_run(tmp_path: Path):
     r = _run("export-canvas", "--project", str(repo), "--dry-run")
     assert r.returncode == 0
 
-    canvas_path = repo / "agent-knowledge" / "Outputs" / "knowledge-export.canvas"
+    canvas_path = repo / "bedrock" / "Outputs" / "knowledge-export.canvas"
     assert not canvas_path.exists(), "dry-run must not create the canvas file"
 
 
@@ -1124,7 +1123,7 @@ def test_export_canvas_memory_nodes_present(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("export-canvas", "--project", str(repo))
 
-    canvas_path = repo / "agent-knowledge" / "Outputs" / "knowledge-export.canvas"
+    canvas_path = repo / "bedrock" / "Outputs" / "knowledge-export.canvas"
     data = json.loads(canvas_path.read_text())
     node_files = [n.get("file", "") for n in data["nodes"]]
     assert any("Memory" in f for f in node_files), "Canvas must include Memory/ nodes"
@@ -1137,7 +1136,7 @@ def test_canvas_is_non_canonical(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("export-canvas", "--project", str(repo))
 
-    memory_dir = repo / "agent-knowledge" / "Memory"
+    memory_dir = repo / "bedrock" / "Memory"
     canvas_in_memory = list(memory_dir.rglob("*.canvas"))
     assert canvas_in_memory == [], "Canvas files must not appear in Memory/"
 
@@ -1154,7 +1153,7 @@ def test_backfill_history_creates_structure(tmp_path: Path):
     r = _run("backfill-history", "--project", str(repo))
     assert r.returncode == 0, f"backfill-history failed: {r.stderr}"
 
-    vault = repo / "agent-knowledge"
+    vault = repo / "bedrock"
     assert (vault / "History").is_dir(), "History/ must be created"
     assert (vault / "History" / "events.ndjson").is_file(), "events.ndjson must exist"
     assert (vault / "History" / "history.md").is_file(), "history.md must exist"
@@ -1187,14 +1186,14 @@ def test_backfill_history_dry_run(tmp_path: Path):
 
     # Remove any History/ created by init
     import shutil
-    hist = repo / "agent-knowledge" / "History"
+    hist = repo / "bedrock" / "History"
     if hist.exists():
         shutil.rmtree(hist)
 
     r = _run("backfill-history", "--project", str(repo), "--dry-run")
     assert r.returncode == 0
 
-    assert not (repo / "agent-knowledge" / "History" / "events.ndjson").exists(), \
+    assert not (repo / "bedrock" / "History" / "events.ndjson").exists(), \
         "dry-run must not create events.ndjson"
 
 
@@ -1224,7 +1223,7 @@ def test_backfill_events_ndjson_valid(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("backfill-history", "--project", str(repo))
 
-    events_path = repo / "agent-knowledge" / "History" / "events.ndjson"
+    events_path = repo / "bedrock" / "History" / "events.ndjson"
     assert events_path.is_file()
 
     lines = [l.strip() for l in events_path.read_text().splitlines() if l.strip()]
@@ -1245,7 +1244,7 @@ def test_backfill_history_does_not_pollute_memory(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
     # Seed a memory note
-    memory_dir = repo / "agent-knowledge" / "Memory"
+    memory_dir = repo / "bedrock" / "Memory"
     test_note = memory_dir / "test-area.md"
     test_note.write_text("---\nnote_type: branch-entry\narea: test\n---\n\n# Test\n\nContent.\n")
     original = test_note.read_text()
@@ -1260,12 +1259,12 @@ def test_backfill_history_does_not_pollute_memory(tmp_path: Path):
 
 
 def test_init_backfills_history(tmp_path: Path):
-    """agent-knowledge init must automatically create History/ layer."""
+    """bedrock init must automatically create History/ layer."""
     repo = _init_repo(tmp_path, "hist-init-auto")
     kh = tmp_path / "kh"
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
-    vault = repo / "agent-knowledge"
+    vault = repo / "bedrock"
     # History/ may not always be created if the vault is truly empty (no git)
     # but events.ndjson should exist if history was backfilled
     # Just check the command succeeded and no crash occurred
@@ -1290,7 +1289,7 @@ def test_history_md_is_lightweight(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
     _run("backfill-history", "--project", str(repo))
 
-    history_md = repo / "agent-knowledge" / "History" / "history.md"
+    history_md = repo / "bedrock" / "History" / "history.md"
     if history_md.is_file():
         lines = history_md.read_text().splitlines()
         assert len(lines) < 150, f"history.md exceeds 150 lines: {len(lines)}"
@@ -1334,7 +1333,7 @@ def test_refresh_system_dry_run(tmp_path: Path):
 
     # Record mtime of key files before dry-run
     agents_md = repo / "AGENTS.md"
-    status_md = repo / "agent-knowledge" / "STATUS.md"
+    status_md = repo / "bedrock" / "STATUS.md"
     mtime_agents = agents_md.stat().st_mtime if agents_md.exists() else None
     mtime_status = status_md.stat().st_mtime if status_md.exists() else None
 
@@ -1386,7 +1385,7 @@ def test_refresh_system_never_touches_memory(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
     # Seed a memory note
-    memory_dir = repo / "agent-knowledge" / "Memory"
+    memory_dir = repo / "bedrock" / "Memory"
     test_note = memory_dir / "test-branch.md"
     test_note.write_text("---\nnote_type: branch-entry\narea: test\n---\n\n# Test\n\nContent.\n")
     original_content = test_note.read_text()
@@ -1404,7 +1403,7 @@ def test_refresh_system_updates_status_md_version(tmp_path: Path):
 
     _run("refresh-system", "--project", str(repo))
 
-    status = (repo / "agent-knowledge" / "STATUS.md").read_text()
+    status = (repo / "bedrock" / "STATUS.md").read_text()
     assert "framework_version:" in status
     assert "last_system_refresh:" in status
 
@@ -1462,7 +1461,7 @@ def test_core_cli_flow_unchanged(tmp_path: Path):
         assert parsed.get("script") == "doctor"
 
     # Verify new commands do not interfere with Memory/
-    memory_dir = repo / "agent-knowledge" / "Memory"
+    memory_dir = repo / "bedrock" / "Memory"
     for f in memory_dir.rglob("*"):
         if f.suffix in (".canvas", ".json", ".html"):
             pytest.fail(f"Non-markdown file found in Memory/: {f}")
@@ -1484,7 +1483,7 @@ def test_init_installs_cursor_commands(tmp_path: Path):
 
 
 def test_cursor_commands_reference_installed_runtime(tmp_path: Path):
-    """Cursor command files must reference 'agent-knowledge', not repo-relative paths."""
+    """Cursor command files must reference 'bedrock', not repo-relative paths."""
     repo = _init_repo(tmp_path, "cmd-runtime")
     kh = tmp_path / "kh"
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
@@ -1493,15 +1492,15 @@ def test_cursor_commands_reference_installed_runtime(tmp_path: Path):
         cmd_file = repo / ".cursor" / "commands" / cmd_name
         assert cmd_file.is_file(), f"{cmd_name} must be installed"
         content = cmd_file.read_text()
-        assert "agent-knowledge" in content, \
-            f"{cmd_name} must reference the installed 'agent-knowledge' CLI"
+        assert "bedrock" in content, \
+            f"{cmd_name} must reference the installed 'bedrock' CLI"
         # Must not use repo-relative script paths
         assert "scripts/" not in content, \
             f"{cmd_name} must not use repo-relative scripts/"
 
 
 def test_memory_update_command_covers_sync(tmp_path: Path):
-    """/memory-update command must instruct the agent to run agent-knowledge sync."""
+    """/memory-update command must instruct the agent to run bedrock sync."""
     repo = _init_repo(tmp_path, "mem-cmd")
     kh = tmp_path / "kh"
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
@@ -1528,7 +1527,7 @@ def test_hooks_have_all_expected_events(tmp_path: Path):
 
 
 def test_hooks_reference_installed_runtime(tmp_path: Path):
-    """All hooks must call 'agent-knowledge', not repo-relative scripts."""
+    """All hooks must call 'bedrock', not repo-relative scripts."""
     repo = _init_repo(tmp_path, "hooks-runtime")
     kh = tmp_path / "kh"
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
@@ -1536,8 +1535,8 @@ def test_hooks_reference_installed_runtime(tmp_path: Path):
     data = json.loads((repo / ".cursor" / "hooks.json").read_text())
     for hook in data.get("hooks", []):
         cmd = hook.get("command", "")
-        assert cmd.startswith("agent-knowledge "), \
-            f"Hook '{hook['name']}' must call agent-knowledge, got: {cmd}"
+        assert cmd.startswith("bedrock "), \
+            f"Hook '{hook["name"]}' must call bedrock, got: {cmd}"
 
 
 def test_refresh_system_installs_commands(tmp_path: Path):
@@ -1645,7 +1644,7 @@ def test_cursor_rule_contains_knowledge_layers(tmp_path: Path):
     kh = tmp_path / "kh"
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
-    rule = (repo / ".cursor" / "rules" / "agent-knowledge.mdc").read_text()
+    rule = (repo / ".cursor" / "rules" / "bedrock.mdc").read_text()
     assert "Memory/" in rule
     assert "Evidence/" in rule
     assert "Outputs/" in rule
@@ -1660,7 +1659,7 @@ def test_cursor_rule_mentions_memory_update_command(tmp_path: Path):
     kh = tmp_path / "kh"
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
-    rule = (repo / ".cursor" / "rules" / "agent-knowledge.mdc").read_text()
+    rule = (repo / ".cursor" / "rules" / "bedrock.mdc").read_text()
     assert "/memory-update" in rule
 
 
@@ -1671,13 +1670,13 @@ def test_init_cursor_integration_idempotent(tmp_path: Path):
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
     # Record content after first init
-    rule_content = (repo / ".cursor" / "rules" / "agent-knowledge.mdc").read_text()
+    rule_content = (repo / ".cursor" / "rules" / "bedrock.mdc").read_text()
     hooks_content = (repo / ".cursor" / "hooks.json").read_text()
 
     _run("init", "--repo", str(repo), "--knowledge-home", str(kh))
 
     # Content must be unchanged (not force-overwritten)
-    assert (repo / ".cursor" / "rules" / "agent-knowledge.mdc").read_text() == rule_content
+    assert (repo / ".cursor" / "rules" / "bedrock.mdc").read_text() == rule_content
     assert (repo / ".cursor" / "hooks.json").read_text() == hooks_content
 
 
@@ -1690,7 +1689,7 @@ def test_bundled_cursor_commands_exist():
         path = assets / "templates" / "integrations" / "cursor" / "commands" / cmd
         assert path.is_file(), f"Bundled cursor command missing: {path}"
         content = path.read_text()
-        assert "agent-knowledge" in content, f"{cmd} must reference agent-knowledge CLI"
+        assert "bedrock" in content, f"{cmd} must reference bedrock CLI"
 
 
 def test_check_cursor_integration_importable():
@@ -1729,7 +1728,7 @@ def test_claude_settings_hooks_reference_installed_cli(tmp_path: Path):
 
     settings = repo / ".claude" / "settings.json"
     content = settings.read_text()
-    assert "agent-knowledge" in content
+    assert "bedrock" in content
     # Must not contain repo-relative script paths
     assert "scripts/" not in content
     assert "bash " not in content
@@ -1760,7 +1759,7 @@ def test_init_installs_claude_commands(tmp_path: Path):
         path = repo / ".claude" / "commands" / cmd
         assert path.is_file(), f".claude/commands/{cmd} must be created"
         content = path.read_text()
-        assert "agent-knowledge" in content, f"{cmd} must reference agent-knowledge CLI"
+        assert "bedrock" in content, f"{cmd} must reference bedrock CLI"
 
 
 def test_init_installs_claude_md(tmp_path: Path):
@@ -1772,7 +1771,7 @@ def test_init_installs_claude_md(tmp_path: Path):
     claude_md = repo / ".claude" / "CLAUDE.md"
     assert claude_md.is_file(), ".claude/CLAUDE.md must be created"
     content = claude_md.read_text()
-    assert "agent-knowledge" in content
+    assert "bedrock" in content
     assert "Memory/" in content
     assert "Evidence/" in content
     assert "STATUS.md" in content
@@ -1905,7 +1904,7 @@ def test_bundled_claude_templates_exist():
         path = assets / "templates" / "integrations" / "claude" / "commands" / cmd
         assert path.is_file(), f"Bundled Claude command missing: {path}"
         content = path.read_text()
-        assert "agent-knowledge" in content
+        assert "bedrock" in content
 
 
 def test_claude_expected_hook_events():
@@ -1987,7 +1986,7 @@ def test_absorb_dry_run_no_mutation(tmp_path: Path):
     r = _run("absorb", "--project", str(repo), "--dry-run")
     assert r.returncode == 0
     # Dry run must not create files
-    imports_dir = repo / "agent-knowledge" / "Evidence" / "imports"
+    imports_dir = repo / "bedrock" / "Evidence" / "imports"
     imported = list(imports_dir.glob("ARCHITECTURE*.md")) if imports_dir.exists() else []
     assert imported == [], "dry-run must not create files"
 
@@ -1998,7 +1997,7 @@ def test_absorb_imports_docs(tmp_path: Path):
     (repo / "CHANGELOG.md").write_text("# Changelog\n\n## v1.0.0\n- initial release\n")
     r = _run("absorb", "--project", str(repo))
     assert r.returncode == 0
-    imports_dir = repo / "agent-knowledge" / "Evidence" / "imports"
+    imports_dir = repo / "bedrock" / "Evidence" / "imports"
     assert imports_dir.is_dir()
     files = list(imports_dir.glob("*.md"))
     assert len(files) >= 2
@@ -2008,7 +2007,7 @@ def test_absorb_imports_have_metadata_header(tmp_path: Path):
     repo = _init_with_vault(tmp_path)
     (repo / "ARCHITECTURE.md").write_text("# Architecture\n\nDetails here.\n")
     _run("absorb", "--project", str(repo))
-    imports_dir = repo / "agent-knowledge" / "Evidence" / "imports"
+    imports_dir = repo / "bedrock" / "Evidence" / "imports"
     arch_files = list(imports_dir.glob("*ARCHITECTURE*"))
     assert arch_files, "ARCHITECTURE.md should be imported"
     content = arch_files[0].read_text()
@@ -2024,7 +2023,7 @@ def test_absorb_docs_dir(tmp_path: Path):
     (docs / "api.md").write_text("# API\n\nEndpoints.\n")
     r = _run("absorb", "--project", str(repo))
     assert r.returncode == 0
-    imports_dir = repo / "agent-knowledge" / "Evidence" / "imports"
+    imports_dir = repo / "bedrock" / "Evidence" / "imports"
     files = list(imports_dir.glob("*.md"))
     assert any("design" in f.name for f in files)
     assert any("api" in f.name for f in files)
@@ -2039,7 +2038,7 @@ def test_absorb_adr_parsed_into_decisions(tmp_path: Path):
     )
     r = _run("absorb", "--project", str(repo))
     assert r.returncode == 0
-    decisions_path = repo / "agent-knowledge" / "Memory" / "decisions" / "decisions.md"
+    decisions_path = repo / "bedrock" / "Memory" / "decisions" / "decisions.md"
     assert decisions_path.is_file()
     content = decisions_path.read_text()
     assert "adr/001-use-postgres.md" in content
@@ -2050,7 +2049,7 @@ def test_absorb_idempotent(tmp_path: Path):
     (repo / "ARCHITECTURE.md").write_text("# Architecture\n\nStable.\n")
     _run("absorb", "--project", str(repo))
     _run("absorb", "--project", str(repo))
-    imports_dir = repo / "agent-knowledge" / "Evidence" / "imports"
+    imports_dir = repo / "bedrock" / "Evidence" / "imports"
     arch_files = list(imports_dir.glob("*ARCHITECTURE*"))
     assert len(arch_files) == 1, "idempotent: file should not be duplicated"
 
@@ -2060,7 +2059,7 @@ def test_absorb_manifest_created(tmp_path: Path):
     (repo / "ARCHITECTURE.md").write_text("# Arch\n\nContent.\n")
     r = _run("absorb", "--project", str(repo))
     assert r.returncode == 0
-    manifest = repo / "agent-knowledge" / "Outputs" / "absorb-manifest.md"
+    manifest = repo / "bedrock" / "Outputs" / "absorb-manifest.md"
     assert manifest.is_file()
     content = manifest.read_text()
     assert "ARCHITECTURE.md" in content
@@ -2071,7 +2070,7 @@ def test_absorb_manifest_not_in_memory(tmp_path: Path):
     repo = _init_with_vault(tmp_path)
     (repo / "ARCHITECTURE.md").write_text("# Arch\n\nContent.\n")
     _run("absorb", "--project", str(repo))
-    memory_dir = repo / "agent-knowledge" / "Memory"
+    memory_dir = repo / "bedrock" / "Memory"
     md_files = list(memory_dir.rglob("absorb-manifest.md"))
     assert not md_files, "absorb-manifest.md must not appear in Memory/"
 
@@ -2096,7 +2095,7 @@ def test_absorb_no_vault_exits_nonzero(tmp_path: Path):
 def test_absorb_skips_vault_files(tmp_path: Path):
     repo = _init_with_vault(tmp_path)
     # Write a file inside the vault -- should not be re-imported
-    vault = repo / "agent-knowledge"
+    vault = repo / "bedrock"
     (vault / "Memory" / "MEMORY.md").write_text("# Memory\n\nContent.\n")
     r = _run("absorb", "--project", str(repo), "--json")
     assert r.returncode == 0
