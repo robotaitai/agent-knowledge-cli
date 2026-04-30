@@ -5,6 +5,13 @@ All knowledge lives in `./bedrock/`.
 
 ## On session start
 
+If `./bedrock/` does not exist but `./agent-knowledge/` does, this project needs migration -- tell the user to run:
+```
+bedrock migrate-vault && bedrock refresh-system
+```
+
+Otherwise:
+
 1. Read `./bedrock/STATUS.md`
 2. If `onboarding: pending` -- read `AGENTS.md` and perform First-Time Onboarding
 3. If `onboarding: complete` -- read `./bedrock/Memory/MEMORY.md`

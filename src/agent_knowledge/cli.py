@@ -1215,7 +1215,7 @@ def migrate_to_local(project: str, knowledge_home: str | None, dry_run: bool) ->
     click.echo("Commit bedrock/ (excluding the patterns added to .gitignore).", err=True)
 
 
-@main.command(name="migrate-vault", hidden=True)
+@main.command(name="migrate-vault")
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root (default: cwd).")
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
 def migrate_vault(project: str, dry_run: bool) -> None:
@@ -1318,7 +1318,7 @@ def migrate_vault(project: str, dry_run: bool) -> None:
     click.echo("  4. git commit -m \"chore: migrate vault agent-knowledge -> bedrock\"", err=True)
 
 
-@main.command(name="migrate-from-legacy", hidden=True)
+@main.command(name="migrate-from-legacy")
 @click.option("--project", default=".", type=click.Path(exists=True), help="Project repo root (default: cwd).")
 @click.option("--dry-run", is_flag=True, help="Preview changes without writing.")
 def migrate_from_legacy(project: str, dry_run: bool) -> None:
