@@ -127,6 +127,20 @@ Think of the vault as your team's **shared notebook**. Casual scribbles don't ge
 
 The project carries **everything it needs**. Both Claude Code and Cursor get full integration installed automatically -- hooks, runtime contracts, and slash commands. No global config.
 
+### Platform & Tool Support
+
+| | ![Claude Code](https://img.shields.io/badge/Claude_Code-black?logo=anthropic) | ![Cursor](https://img.shields.io/badge/Cursor-black?logo=cursor) | ![Codex](https://img.shields.io/badge/Codex-black?logo=openai) |
+|:---|:---:|:---:|:---:|
+| ![macOS](https://img.shields.io/badge/macOS-silver?logo=apple&logoColor=black) | ![full](https://img.shields.io/badge/full-2ea44f) | ![full](https://img.shields.io/badge/full-2ea44f) | ![bridge](https://img.shields.io/badge/bridge_only-lightgrey) |
+| ![Linux](https://img.shields.io/badge/Linux-silver?logo=linux&logoColor=black) | ![full](https://img.shields.io/badge/full-2ea44f) | ![full](https://img.shields.io/badge/full-2ea44f) | ![bridge](https://img.shields.io/badge/bridge_only-lightgrey) |
+| ![Windows](https://img.shields.io/badge/Windows-silver?logo=windows&logoColor=0078d4) | ![partial](https://img.shields.io/badge/partial-e3a008) | ![partial](https://img.shields.io/badge/partial-e3a008) | ![bridge](https://img.shields.io/badge/bridge_only-lightgrey) |
+
+![full](https://img.shields.io/badge/full-2ea44f) &nbsp;Auto-installed on `init` -- hooks fire automatically, slash commands active, `bedrock doctor` validates health. &nbsp;
+![partial](https://img.shields.io/badge/partial-e3a008) &nbsp;Bridge files install correctly; hooks need `bash` on PATH (Git for Windows or WSL). Not tested in CI. &nbsp;
+![bridge](https://img.shields.io/badge/bridge_only-lightgrey) &nbsp;`AGENTS.md` installed when `.codex/` detected -- agent loads memory context, no automated hooks.
+
+> CI matrix: ubuntu-latest + macos-latest, Python 3.9 / 3.12 / 3.13.
+
 <details>
 <summary><b>Claude Code</b> &nbsp;<code>.claude/</code></summary>
 
