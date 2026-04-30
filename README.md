@@ -41,7 +41,7 @@ It works like the operating discipline of a strong team lead:
 
 With one command, your project gets:
 - structured memory for architecture, decisions, conventions, and history
-- project-local integration for **Claude Code** and **Cursor**
+- project-local integration for **Claude Code**, **Cursor**, and **Codex**
 - lightweight git-friendly markdown that lives with the repo
 - HTML, graph, and Obsidian-ready views of what the project knows
 
@@ -76,7 +76,7 @@ bedrock init
 
 | Step | What happens |
 |------|-------------|
-| 1 | Creates `./agent-knowledge/` as a **real directory** inside the repo (git-tracked) |
+| 1 | Creates `./bedrock/` as a **real directory** inside the repo (git-tracked) |
 | 2 | Registers the project in `~/agent-os/projects/<slug>/` so **every project shows up in one place** -- open it in Obsidian for a unified cross-project vault |
 | 3 | Adds noisy subfolders (`Evidence/raw/`, `Outputs/site/`, ...) to `.gitignore` automatically |
 | 4 | Installs project-local integration for **Claude Code** and **Cursor** |
@@ -125,7 +125,7 @@ Think of the vault as your team's **shared notebook**. Casual scribbles don't ge
 
 ## 🔌 Project-Local Integration
 
-The project carries **everything it needs**. Both Claude Code and Cursor get full integration installed automatically -- hooks, runtime contracts, and slash commands. No global config.
+The project carries **everything it needs**. Claude Code, Cursor, and Codex all get integration installed automatically on `init` -- hooks, runtime contracts, and slash commands. No global config.
 
 ### Platform & Tool Support
 
@@ -162,7 +162,7 @@ The project carries **everything it needs**. Both Claude Code and Cursor get ful
 
 | File | Purpose |
 |------|---------|
-| `rules/agent-knowledge.mdc` | Always-on rule: loads memory context on every session |
+| `rules/bedrock.mdc` | Always-on rule: loads memory context on every session |
 | `hooks.json` | Lifecycle hooks: sync on start, update on write, sync on stop/compact |
 | `commands/memory-update.md` | `/memory-update` slash command |
 | `commands/system-update.md` | `/system-update` slash command |
@@ -217,7 +217,7 @@ Reports whether all integration files are installed and current. If anything is 
 
 ## 🔮 Obsidian-Ready
 
-Each project's `./agent-knowledge/` is a valid **Obsidian vault** on its own. But the real payoff is `~/agent-os/projects/`: every project you've ever run `init` in is registered there. Open that folder in Obsidian and you have **a unified vault across all your teams' projects** -- backlinks, graph view, and full-text search spanning every codebase you manage.
+Each project's `./bedrock/` is a valid **Obsidian vault** on its own. But the real payoff is `~/agent-os/projects/`: every project you've ever run `init` in is registered there. Open that folder in Obsidian and you have **a unified vault across all your teams' projects** -- backlinks, graph view, and full-text search spanning every codebase you manage.
 
 One window. Every team.
 
@@ -225,7 +225,7 @@ One window. Every team.
 
 ```bash
 bedrock export-canvas
-# produces: agent-knowledge/Outputs/knowledge-export.canvas
+# produces: bedrock/Outputs/knowledge-export.canvas
 ```
 
 Obsidian is optional. Works without it too.
@@ -264,7 +264,7 @@ All write commands support `--dry-run` and `--json`. Run `bedrock --help` for th
 - [Migrating from agent-knowledge-cli](docs/reference.md#migrating-from-agent-knowledge-cli) -- 3-step migration to `project-bedrock` and the `bedrock` CLI
 - [Custom knowledge home](docs/reference.md#custom-knowledge-home) -- change where `~/agent-os/` lives
 - [Troubleshooting](docs/reference.md#troubleshooting) -- common issues and fixes
-- [Platform support](docs/reference.md#platform-support) -- macOS, Linux, Python 3.9+
+- [Platform support](docs/reference.md#platform-support) -- macOS, Linux, Windows, Python 3.9+
 - [Development](docs/reference.md#development) -- contributing and running tests
 
 ## Star History
