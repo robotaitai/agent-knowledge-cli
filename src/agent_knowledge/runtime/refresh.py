@@ -33,7 +33,7 @@ def _now_iso() -> str:
 
 def _read_text(path: Path) -> str:
     try:
-        return path.read_text(errors="replace") if path.is_file() else ""
+        return path.read_text(encoding="utf-8", errors="replace") if path.is_file() else ""
     except OSError:
         return ""
 
@@ -104,7 +104,7 @@ def _refresh_agents_md(repo_root: Path, *, dry_run: bool) -> dict[str, Any]:
     if not template_path.is_file():
         return {"target": "AGENTS.md", "action": "skip", "detail": "bundled template not found"}
 
-    template = template_path.read_text()
+    template = template_path.read_text(encoding="utf-8")
     current = _read_text(target)
 
     _TODO = "## TODO"
@@ -142,8 +142,8 @@ def _refresh_cursor_hooks(repo_root: Path, *, dry_run: bool) -> dict[str, Any]:
         return {"target": ".cursor/hooks.json", "action": "skip", "detail": "not installed; run: bedrock init"}
 
     repo_abs = repo_root.resolve().as_posix()
-    template_content = template_path.read_text().replace("<repo-path>", repo_abs)
-    current_content = target.read_text(errors="replace")
+    template_content = template_path.read_text(encoding="utf-8").replace("<repo-path>", repo_abs)
+    current_content = target.read_text(encoding="utf-8", errors="replace")
 
     tmpl_obj = _normalize_json(template_content)
     curr_obj = _normalize_json(current_content)
@@ -165,7 +165,7 @@ def _refresh_cursor_rule(repo_root: Path, *, dry_run: bool) -> dict[str, Any]:
     template_path = get_assets_dir() / "templates" / "integrations" / "cursor" / "bedrock.mdc"
 
     if template_path.is_file():
-        template = template_path.read_text()
+        template = template_path.read_text(encoding="utf-8")
     else:
         from agent_knowledge.runtime.integrations import _CURSOR_RULE as _fallback
         template = _fallback
@@ -181,7 +181,7 @@ def _refresh_cursor_rule(repo_root: Path, *, dry_run: bool) -> dict[str, Any]:
     if not target.is_file():
         return {"target": ".cursor/rules/bedrock.mdc", "action": "skip", "detail": "not installed; run: bedrock init"}
 
-    current = target.read_text(errors="replace")
+    current = target.read_text(encoding="utf-8", errors="replace")
     if current.strip() == template.strip():
         return {"target": ".cursor/rules/bedrock.mdc", "action": "up-to-date", "detail": "rule is current"}
 
@@ -201,8 +201,8 @@ def _refresh_claude_settings(repo_root: Path, *, dry_run: bool) -> dict[str, Any
         return {"target": ".claude/settings.json", "action": "skip", "detail": "not installed; run: bedrock init"}
 
     repo_abs = repo_root.resolve().as_posix()
-    template_content = template_path.read_text().replace("<repo-path>", repo_abs)
-    current_content = target.read_text(errors="replace")
+    template_content = template_path.read_text(encoding="utf-8").replace("<repo-path>", repo_abs)
+    current_content = target.read_text(encoding="utf-8", errors="replace")
 
     tmpl_obj = _normalize_json(template_content)
     curr_obj = _normalize_json(current_content)
@@ -228,8 +228,8 @@ def _refresh_claude_md(repo_root: Path, *, dry_run: bool) -> dict[str, Any]:
     if not target.is_file():
         return {"target": ".claude/CLAUDE.md", "action": "skip", "detail": "not installed; run: bedrock init"}
 
-    template = template_path.read_text()
-    current = target.read_text(errors="replace")
+    template = template_path.read_text(encoding="utf-8")
+    current = target.read_text(encoding="utf-8", errors="replace")
 
     if current.strip() == template.strip():
         return {"target": ".claude/CLAUDE.md", "action": "up-to-date", "detail": "already matches template"}
@@ -267,12 +267,12 @@ def _refresh_claude_commands(repo_root: Path, *, dry_run: bool) -> list[dict[str
         target = commands_dir / template_file.name
 
         if not target.exists():
-            action = _write(target, template_file.read_text(), dry_run=dry_run)
+            action = _write(target, template_file.read_text(encoding="utf-8"), dry_run=dry_run)
             results.append({"target": rel, "action": action, "detail": "created from bundled template"})
             continue
 
-        template_content = template_file.read_text()
-        current_content = target.read_text(errors="replace")
+        template_content = template_file.read_text(encoding="utf-8")
+        current_content = target.read_text(encoding="utf-8", errors="replace")
 
         if current_content.strip() == template_content.strip():
             results.append({"target": rel, "action": "up-to-date", "detail": "command is current"})
@@ -298,12 +298,12 @@ def _refresh_cursor_commands(repo_root: Path, *, dry_run: bool) -> list[dict[str
         target = commands_dir / template_file.name
 
         if not target.exists():
-            action = _write(target, template_file.read_text(), dry_run=dry_run)
+            action = _write(target, template_file.read_text(encoding="utf-8"), dry_run=dry_run)
             results.append({"target": rel, "action": action, "detail": "created from bundled template"})
             continue
 
-        template_content = template_file.read_text()
-        current_content = target.read_text(errors="replace")
+        template_content = template_file.read_text(encoding="utf-8")
+        current_content = target.read_text(encoding="utf-8", errors="replace")
 
         if current_content.strip() == template_content.strip():
             results.append({"target": rel, "action": "up-to-date", "detail": "command is current"})
@@ -326,8 +326,8 @@ def _refresh_codex_agents_md(repo_root: Path, *, dry_run: bool) -> dict[str, Any
     if not target.is_file():
         return {"target": ".codex/AGENTS.md", "action": "skip", "detail": "not installed; run: bedrock init"}
 
-    template = template_path.read_text()
-    current = target.read_text(errors="replace")
+    template = template_path.read_text(encoding="utf-8")
+    current = target.read_text(encoding="utf-8", errors="replace")
 
     if current.strip() == template.strip():
         return {"target": ".codex/AGENTS.md", "action": "up-to-date", "detail": "already matches template"}
@@ -535,7 +535,7 @@ def check_cursor_integration(repo_root: Path) -> dict[str, Any]:
     info["hooks_installed"] = hooks_file.is_file()
     if hooks_file.is_file():
         try:
-            hooks_data = json.loads(hooks_file.read_text())
+            hooks_data = json.loads(hooks_file.read_text(encoding="utf-8"))
             events = {h.get("event") for h in hooks_data.get("hooks", [])}
             missing_events = CURSOR_EXPECTED_HOOK_EVENTS - events
             info["hook_events"] = sorted(events - {None})
@@ -598,7 +598,7 @@ def check_claude_integration(repo_root: Path) -> dict[str, Any]:
     info["settings_installed"] = settings_file.is_file()
     if settings_file.is_file():
         try:
-            settings_data = json.loads(settings_file.read_text())
+            settings_data = json.loads(settings_file.read_text(encoding="utf-8"))
             hooks_section = settings_data.get("hooks", {})
             events = set(hooks_section.keys())
             missing_events = CLAUDE_EXPECTED_HOOK_EVENTS - events

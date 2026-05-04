@@ -60,12 +60,12 @@ def _patch_gitignore_for_local_knowledge(repo_path: Path, json_mode: bool) -> No
     """Append local-mode knowledge gitignore patterns if not already present."""
     gitignore = repo_path / ".gitignore"
     if gitignore.exists():
-        content = gitignore.read_text()
+        content = gitignore.read_text(encoding="utf-8")
         if _LOCAL_GITIGNORE_SENTINEL in content:
             return  # already patched
-        gitignore.write_text(content.rstrip("\n") + "\n\n" + _LOCAL_GITIGNORE_BLOCK)
+        gitignore.write_text(content.rstrip("\n") + "\n\n" + _LOCAL_GITIGNORE_BLOCK, encoding="utf-8")
     else:
-        gitignore.write_text(_LOCAL_GITIGNORE_BLOCK)
+        gitignore.write_text(_LOCAL_GITIGNORE_BLOCK, encoding="utf-8")
     if not json_mode:
         click.echo("  .gitignore: added local knowledge patterns", err=True)
 
@@ -1167,7 +1167,7 @@ def migrate_to_local(project: str, knowledge_home: str | None, dry_run: bool) ->
     slug = repo_path.name  # fallback
     if project_yaml.exists():
         try:
-            m = _re.search(r"^\s*slug:\s*(\S+)", project_yaml.read_text(), _re.MULTILINE)
+            m = _re.search(r"^\s*slug:\s*(\S+)", project_yaml.read_text(encoding="utf-8"), _re.MULTILINE)
             if m:
                 slug = m.group(1)
         except Exception:
@@ -1189,7 +1189,7 @@ def migrate_to_local(project: str, knowledge_home: str | None, dry_run: bool) ->
     # Update .agent-project.yaml
     if project_yaml.exists():
         try:
-            text = project_yaml.read_text()
+            text = project_yaml.read_text(encoding="utf-8")
             if "vault_mode:" in text:
                 text = _re.sub(r"vault_mode:\s*\S+", "vault_mode: local", text)
             else:
@@ -1202,7 +1202,7 @@ def migrate_to_local(project: str, knowledge_home: str | None, dry_run: bool) ->
                 f"real_path: {pointer}",
                 text,
             )
-            project_yaml.write_text(text)
+            project_yaml.write_text(text, encoding="utf-8")
             click.echo("  updated: .agent-project.yaml (vault_mode: local)", err=True)
         except Exception as e:
             click.echo(f"  warning: could not update .agent-project.yaml: {e}", err=True)
@@ -1268,7 +1268,7 @@ def migrate_vault(project: str, dry_run: bool) -> None:
     slug = repo_path.name
     if project_yaml.is_file():
         try:
-            m = _re.search(r"^\s*slug:\s*(\S+)", project_yaml.read_text(), _re.MULTILINE)
+            m = _re.search(r"^\s*slug:\s*(\S+)", project_yaml.read_text(encoding="utf-8"), _re.MULTILINE)
             if m:
                 slug = m.group(1)
         except Exception:
@@ -1287,12 +1287,12 @@ def migrate_vault(project: str, dry_run: bool) -> None:
     # Update .agent-project.yaml
     if project_yaml.is_file():
         try:
-            text = project_yaml.read_text()
+            text = project_yaml.read_text(encoding="utf-8")
             text = text.replace("./agent-knowledge", "./bedrock")
             text = text.replace("/agent-knowledge/", "/bedrock/")
             text = text.replace("agent-knowledge update", "bedrock update")
             text = text.replace("agent-knowledge graphify-sync", "bedrock graphify-sync")
-            project_yaml.write_text(text)
+            project_yaml.write_text(text, encoding="utf-8")
             click.echo("  updated: .agent-project.yaml", err=True)
         except Exception as e:
             click.echo(f"  warning: could not update .agent-project.yaml: {e}", err=True)
@@ -1301,10 +1301,10 @@ def migrate_vault(project: str, dry_run: bool) -> None:
     gitignore = repo_path / ".gitignore"
     if gitignore.is_file():
         try:
-            text = gitignore.read_text()
+            text = gitignore.read_text(encoding="utf-8")
             if "agent-knowledge/" in text:
                 text = text.replace("agent-knowledge/", "bedrock/")
-                gitignore.write_text(text)
+                gitignore.write_text(text, encoding="utf-8")
                 click.echo("  updated: .gitignore", err=True)
         except Exception as e:
             click.echo(f"  warning: could not update .gitignore: {e}", err=True)
@@ -1452,7 +1452,7 @@ def completion(shell: str | None, install: bool) -> None:
     sentinel = "# bedrock tab completion"
 
     if install:
-        rc_text = rc_file.read_text() if rc_file.exists() else ""
+        rc_text = rc_file.read_text(encoding="utf-8") if rc_file.exists() else ""
         if eval_line in rc_text:
             click.echo(f"Already installed in {rc_file}", err=True)
         else:

@@ -134,7 +134,7 @@ def write_index(vault_dir: Path, *, dry_run: bool = False) -> list[str]:
         ]
 
     outputs_dir.mkdir(parents=True, exist_ok=True)
-    json_dst.write_text(json.dumps(index, indent=2))
+    json_dst.write_text(json.dumps(index, indent=2), encoding="utf-8")
 
     # Compact markdown catalog for agents and humans.
     groups: dict[str, list[dict]] = {}
@@ -171,7 +171,7 @@ def write_index(vault_dir: Path, *, dry_run: bool = False) -> list[str]:
                 md_lines.append(f"  {summary}\n")
         md_lines.append("\n")
 
-    md_dst.write_text("".join(md_lines))
+    md_dst.write_text("".join(md_lines), encoding="utf-8")
 
     return [
         f"  wrote: Outputs/knowledge-index.json ({index['note_count']} notes)",
@@ -195,7 +195,7 @@ def search(
     index_path = vault_dir / "Outputs" / "knowledge-index.json"
     if index_path.is_file():
         try:
-            notes: list[dict] = json.loads(index_path.read_text()).get("notes", [])
+            notes: list[dict] = json.loads(index_path.read_text(encoding="utf-8")).get("notes", [])
         except (json.JSONDecodeError, OSError):
             notes = build_index(vault_dir).get("notes", [])
     else:

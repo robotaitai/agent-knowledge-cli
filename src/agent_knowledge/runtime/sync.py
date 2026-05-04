@@ -153,7 +153,7 @@ Last {count} commits as of {_today()}.
         actions.append(f"  [dry-run] would write: Evidence/raw/git-recent.md ({len(lines.splitlines())} commits)")
     else:
         evidence_dir.mkdir(parents=True, exist_ok=True)
-        dst.write_text(content)
+        dst.write_text(content, encoding="utf-8")
         actions.append(f"  wrote: Evidence/raw/git-recent.md ({len(lines.splitlines())} commits)")
 
     return actions
@@ -169,7 +169,7 @@ def stamp_status(repo: Path, field: str) -> None:
     if not status_path.is_file():
         return
 
-    text = status_path.read_text()
+    text = status_path.read_text(encoding="utf-8")
     now = _now_iso()
     today = _today()
 
@@ -185,7 +185,7 @@ def stamp_status(repo: Path, field: str) -> None:
     if display_pattern.search(text):
         text = display_pattern.sub(rf"\g<1>{now}\2", text)
 
-    status_path.write_text(text)
+    status_path.write_text(text, encoding="utf-8")
 
 
 # ---------------------------------------------------------------------------

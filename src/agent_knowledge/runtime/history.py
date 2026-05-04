@@ -498,7 +498,7 @@ def _update_status_backfill(repo_root: Path, vault_dir: Path) -> None:
     if not status_path.is_file():
         return
     today = datetime.date.today().isoformat()
-    content = status_path.read_text()
+    content = status_path.read_text(encoding="utf-8")
     import re as _re
     updated = _re.sub(
         r"^(last_backfill_import:\s*).*$",
@@ -507,7 +507,7 @@ def _update_status_backfill(repo_root: Path, vault_dir: Path) -> None:
         flags=_re.MULTILINE,
     )
     if updated != content:
-        status_path.write_text(updated)
+        status_path.write_text(updated, encoding="utf-8")
 
 
 def run_backfill(

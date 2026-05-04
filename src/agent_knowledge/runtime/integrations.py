@@ -36,10 +36,10 @@ def _copy_template(src: Path, dst: Path, replacements: dict[str, str], *, force:
     if dst.exists() and not force:
         return "exists"
     dst.parent.mkdir(parents=True, exist_ok=True)
-    content = src.read_text()
+    content = src.read_text(encoding="utf-8")
     for placeholder, value in replacements.items():
         content = content.replace(placeholder, value)
-    dst.write_text(content)
+    dst.write_text(content, encoding="utf-8")
     return "created" if not dst.exists() else "updated"
 
 
@@ -102,8 +102,8 @@ def install_cursor(repo: Path, *, dry_run: bool = False, force: bool = False) ->
         actions.append("  [dry-run] would create: .cursor/hooks.json")
     else:
         hooks_dst.parent.mkdir(parents=True, exist_ok=True)
-        content = hooks_src.read_text().replace("<repo-path>", repo_abs)
-        hooks_dst.write_text(content)
+        content = hooks_src.read_text(encoding="utf-8").replace("<repo-path>", repo_abs)
+        hooks_dst.write_text(content, encoding="utf-8")
         actions.append("  created: .cursor/hooks.json")
 
     # Rule
@@ -114,7 +114,7 @@ def install_cursor(repo: Path, *, dry_run: bool = False, force: bool = False) ->
         actions.append("  [dry-run] would create: .cursor/rules/bedrock.mdc")
     else:
         rule_dst.parent.mkdir(parents=True, exist_ok=True)
-        rule_dst.write_text(_CURSOR_RULE)
+        rule_dst.write_text(_CURSOR_RULE, encoding="utf-8")
         actions.append("  created: .cursor/rules/bedrock.mdc")
 
     # Commands
@@ -151,8 +151,8 @@ def install_claude(repo: Path, *, dry_run: bool = False, force: bool = False) ->
         actions.append("  [dry-run] would create: .claude/settings.json")
     else:
         settings_dst.parent.mkdir(parents=True, exist_ok=True)
-        content = settings_src.read_text().replace("<repo-path>", repo_abs)
-        settings_dst.write_text(content)
+        content = settings_src.read_text(encoding="utf-8").replace("<repo-path>", repo_abs)
+        settings_dst.write_text(content, encoding="utf-8")
         actions.append("  created: .claude/settings.json")
 
     # Commands

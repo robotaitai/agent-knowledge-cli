@@ -72,7 +72,7 @@ def _load_ignores(repo_root: Path) -> set[str]:
     ignore_file = repo_root / ".agentknowledgeignore"
     if not ignore_file.is_file():
         return set()
-    lines = ignore_file.read_text().splitlines()
+    lines = ignore_file.read_text(encoding="utf-8").splitlines()
     return {l.strip() for l in lines if l.strip() and not l.startswith("#")}
 
 
@@ -210,7 +210,7 @@ def _import_to_evidence(
         date=datetime.date.today().isoformat(),
     )
     dst.parent.mkdir(parents=True, exist_ok=True)
-    dst.write_text(header + content)
+    dst.write_text(header + content, encoding="utf-8")
     return {"path": str(rel_path), "action": "imported", "dest": str(dst.relative_to(vault_dir))}
 
 
@@ -228,7 +228,7 @@ def _append_decision(
     dry_run: bool,
 ) -> bool:
     """Append a parsed ADR to decisions.md. Returns True if written."""
-    content = decisions_path.read_text() if decisions_path.is_file() else ""
+    content = decisions_path.read_text(encoding="utf-8") if decisions_path.is_file() else ""
     # Avoid duplicates: skip if source path already mentioned
     if source_path in content:
         return False
@@ -252,9 +252,10 @@ def _append_decision(
         decisions_path.write_text(
             "---\narea: decisions\nupdated: "
             + date
-            + "\n---\n\n# Decisions\n"
+            + "\n---\n\n# Decisions\n",
+            encoding="utf-8",
         )
-    with open(decisions_path, "a") as f:
+    with open(decisions_path, "a", encoding="utf-8") as f:
         f.write(entry)
     return True
 
@@ -321,7 +322,7 @@ def _write_manifest(
     manifest_path = vault_dir / "Outputs" / "absorb-manifest.md"
     if not dry_run:
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
-        manifest_path.write_text(content)
+        manifest_path.write_text(content, encoding="utf-8")
     return manifest_path
 
 

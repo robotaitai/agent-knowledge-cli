@@ -101,7 +101,7 @@ def record(
         lines.append(_yaml_list(related_notes))
 
     captures_dir.mkdir(parents=True, exist_ok=True)
-    dst.write_text("".join(lines))
+    dst.write_text("".join(lines), encoding="utf-8")
     return dst, "created"
 
 
