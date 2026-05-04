@@ -64,11 +64,14 @@ Constants in `integrations.py`:
 
 ## Onboarding Handoff
 
-Bridge files instruct agents to check [[STATUS|STATUS.md]]:
-- If `onboarding: pending` -> follow `AGENTS.md` first-time instructions
-- If `onboarding: complete` -> read [[MEMORY]] for context
-
-No manual `next-prompt` command needed.
+```mermaid
+flowchart TD
+    A["Agent session starts"] --> B{"STATUS.md\nonboarding:?"}
+    B -->|pending| C["Read AGENTS.md\nfirst-time setup"]
+    B -->|complete| D["Read Memory/MEMORY.md\nfor context"]
+    C --> E["Run agent-knowledge init"]
+    E --> D
+```
 
 ## PATH Conflict Gotcha
 

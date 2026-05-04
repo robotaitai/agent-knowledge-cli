@@ -197,15 +197,20 @@ def _md_to_html(text: str) -> str:
             flush_list()
             flush_table()
             if in_code:
-                out.append(html_mod.escape("\n".join(code_buf)))
-                out.append("</code></pre>")
+                if code_lang == "mermaid":
+                    diagram = "\n".join(code_buf)
+                    out.append(f'<div class="mermaid">{diagram}</div>')
+                else:
+                    out.append(html_mod.escape("\n".join(code_buf)))
+                    out.append("</code></pre>")
                 code_buf = []
                 in_code = False
                 code_lang = ""
             else:
                 code_lang = line[3:].strip()
-                cls = f' class="language-{code_lang}"' if code_lang else ""
-                out.append(f'<pre><code{cls}>')
+                if code_lang != "mermaid":
+                    cls = f' class="language-{code_lang}"' if code_lang else ""
+                    out.append(f'<pre><code{cls}>')
                 in_code = True
             continue
 
@@ -888,6 +893,8 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .note-body a.wikilink:hover{border-bottom-style:solid}
 .note-body a.wikilink-missing{color:var(--muted);border-bottom:1px dashed var(--muted);cursor:default}
 .note-body hr{border:none;border-top:1px solid var(--border);margin:18px 0}
+.note-body .mermaid{background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin:14px 0;overflow-x:auto;text-align:center}
+.note-body .mermaid svg{max-width:100%;height:auto}
 .note-body table{border-collapse:collapse;width:100%;margin:14px 0;font-size:13px}
 .note-body th{background:var(--surface-2);padding:6px 12px;text-align:left;border:1px solid var(--border);font-weight:600;color:var(--text-2)}
 .note-body td{padding:6px 12px;border:1px solid var(--border);color:var(--text-2)}
@@ -968,6 +975,25 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 /* graph empty state */
 #gc-empty{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--muted);font-size:14px;pointer-events:none}
 </style>
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'dark',
+  themeVariables: {
+    background: '#161b22',
+    primaryColor: '#1f6feb',
+    primaryTextColor: '#e6edf3',
+    primaryBorderColor: '#30363d',
+    lineColor: '#8b949e',
+    secondaryColor: '#1c2128',
+    tertiaryColor: '#21262d',
+    edgeLabelBackground: '#161b22',
+    fontFamily: '-apple-system,system-ui,sans-serif',
+    fontSize: '13px'
+  }
+});
+</script>
 </head>
 <body>
 <div id="root">

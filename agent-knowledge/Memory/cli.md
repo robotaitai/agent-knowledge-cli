@@ -95,6 +95,17 @@ Built on [[stack|click >= 8.0]] with a `@click.group()` top-level.
 - One-per-tag for release events; once-per-month for backfill/integration events
 - Supports `--dry-run`, `--json`, `--force`
 
+## Core workflow
+
+```mermaid
+flowchart LR
+    init["agent-knowledge init\n(once per project)"] --> sync
+    sync["agent-knowledge sync\n(after work sessions)"] --> doctor
+    doctor["agent-knowledge doctor\n(health + staleness)"]
+    sync --> view["agent-knowledge view\n(browse knowledge site)"]
+    sync --> ship["agent-knowledge ship\n(commit + push)"]
+```
+
 ## export-html / view
 
 - Reads vault → builds `knowledge.json` → builds `graph.json` → renders `index.html`

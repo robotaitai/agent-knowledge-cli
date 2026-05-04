@@ -1,7 +1,7 @@
 ---
 area: history
 project: agent-knowledge
-updated: 2026-04-29
+updated: 2026-05-04
 ---
 
 # Project History
@@ -13,16 +13,20 @@ This is not a git replacement.
 
 ## Timeline Notes
 
+- [2026-05-04-backfill](timeline/2026-05-04-backfill.md)
 - [2026-04-28-backfill](timeline/2026-04-28-backfill.md)
 - [2026-04-26-backfill](timeline/2026-04-26-backfill.md)
 - [2026-04-23-backfill](timeline/2026-04-23-backfill.md)
 - [2026-04-18-backfill](timeline/2026-04-18-backfill.md)
-- [2026-04-11-backfill](timeline/2026-04-11-backfill.md)
 
 ## Recent Activity
 
-- **2026-04-28** `release` [v0.3.1] — Release v0.3.1
-- **2026-04-28** `release` [v0.3.2] — Release v0.3.2
+- **2026-05-04** `backfill` [v0.4.2, v0.4.1] — History backfill: 55 commits, 10 releases, 2 integrations
+- **2026-05-04** `integration_claude` — claude integration detected
+- **2026-05-04** `integration_cursor` — cursor integration detected
+- **2026-05-04** `release` [v0.3.2] — Release v0.3.2
+- **2026-05-04** `release` [v0.4.1] — Release v0.4.1
+- **2026-05-04** `release` [v0.4.2] — Release v0.4.2
 - **2026-04-28** `release` [v0.3.0] — Release v0.3.0
 - **2026-04-28** `release` [v0.2.9] — Release v0.2.9
 - **2026-04-26** `release` [v0.2.8] — Release v0.2.8
@@ -32,10 +36,6 @@ This is not a git replacement.
 - **2026-04-23** `release` [v0.1.1] — Release v0.1.1
 - **2026-04-23** `release` [v0.1.2] — Release v0.1.2
 - **2026-04-23** `release` [v0.2.0] — Release v0.2.0
-- **2026-04-23** `release` [v0.2.1] — Release v0.2.1
-- **2026-04-23** `release` [v0.2.2] — Release v0.2.2
-- **2026-04-23** `release` [v0.2.3] — Release v0.2.3
-- **2026-04-23** `release` [v0.2.4] — Release v0.2.4
 
 ## Reference
 
