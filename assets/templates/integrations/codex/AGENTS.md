@@ -1,54 +1,98 @@
-# Agent Knowledge
+# Agent Knowledge: <project-name>
 
-This project uses bedrock for persistent project memory.
-Read the root `AGENTS.md` for knowledge management instructions.
-Check `./bedrock/STATUS.md` for onboarding state.
-
-If onboarding is pending, follow the instructions in the root AGENTS.md before other work.
+This project uses **Project Bedrock** for persistent project memory.
+All knowledge lives in `./bedrock/`.
 
 ## Session Start
 
-Run at the beginning of each session:
+1. Read `./bedrock/STATUS.md`
+2. If `onboarding: pending` — follow **First-Time Onboarding** below
+3. If `onboarding: complete` — read `./bedrock/Memory/MEMORY.md`, then load branch notes relevant to the current task
+
+Run at session start if shell is available:
 
 ```bash
-bedrock sync --project . && bedrock refresh-system --project .
+bedrock sync --project .
 ```
 
-This syncs memory branches, rolls up sessions, refreshes git evidence, updates the knowledge index, and refreshes integration files.
+---
 
-## Memory Maintenance
+## First-Time Onboarding
 
-After completing meaningful work in a session:
+Only run this if `STATUS.md` shows `onboarding: pending`. Do NOT redo it if already complete.
 
-1. Write updated facts directly to `./bedrock/Memory/<branch>.md`
-   - Update the relevant branch note
-   - Add a dated entry to the `Recent Changes` section
-   - Update `./bedrock/Memory/MEMORY.md` if branch summaries changed
-2. Run `bedrock sync --project .` to propagate changes
+1. Inspect project structure: manifests, package files, CI/CD config, docs
+2. Review recent git history (last ~50 commits)
+3. Infer functional domains from the repo — use the project's own terminology as branch names (e.g. `perception`, `navigation`), not generic ones (e.g. `architecture`)
+4. Create one branch note per domain in `./bedrock/Memory/`. Each note under ~150 lines.
+5. Link related notes to each other with relative markdown links
+6. Update `./bedrock/Memory/MEMORY.md` with one-line summaries and links to all branches
+7. Set `onboarding: complete` in `./bedrock/STATUS.md`
+
+### Branch Layout
+
+```
+bedrock/Memory/
+  MEMORY.md                    # root index — always read first
+  stack.md                     # flat note when no subtopics needed
+  perception/
+    perception.md              # entry note = same name as folder
+    fusion.md
+  navigation/
+    navigation.md
+  decisions/
+    decisions.md
+    2025-01-15-use-raw-sql.md
+```
+
+Rules:
+- Only confirmed facts go into `Memory/` — never speculate
+- Raw material stays in `Evidence/`, generated views in `Outputs/`
+- Notes stay under ~150 lines — split when too big
+- Do NOT lump unrelated domains into one note
+
+---
+
+## Memory Update (end of session)
+
+Run this mentally at the end of any session with meaningful work:
+
+1. Edit the relevant branch note(s) in `./bedrock/Memory/`
+   - Update `## Current State` with confirmed facts (replace stale entries)
+   - Add a `YYYY-MM-DD — what changed` line to `## Recent Changes`
+2. Update `./bedrock/Memory/MEMORY.md` if branch one-line summaries changed
+3. Run `bedrock sync --project .` to propagate
 
 Write to memory when:
-- An architectural decision was made
-- A new command, module, or feature was completed
-- A gotcha or constraint was discovered
-- A pattern or convention was confirmed
-- Test count or CI setup changed
+- A new feature, command, or module was completed
+- An architectural decision was made or changed
+- A gotcha, constraint, or pattern was confirmed
 
-## Periodic (every few sessions)
+Skip writeback for read-only sessions, speculative changes, or session-specific context.
 
-Run to keep integration files current with the installed framework:
+---
 
-```bash
-bedrock refresh-system --project .
-```
+## Compact Context (when context window is long)
 
-Do NOT write to memory for:
-- Read-only exploration with no conclusions
-- Speculative or unconfirmed changes
-- Session-specific context that won't matter next session
+When the context window is getting long:
+
+1. Update memory (see Memory Update above)
+2. Write a brief handoff note summarizing what was done and what comes next
+3. Start a fresh session — context will reload from `Memory/MEMORY.md`
+
+---
 
 ## Knowledge Structure
 
-- `./bedrock/Memory/` -- Canonical project knowledge (write here)
-- `./bedrock/Evidence/` -- Non-canonical: imports, extracts
-- `./bedrock/Outputs/` -- Generated views (never canonical)
-- `./bedrock/History/` -- Lightweight diary, events, releases
+| Folder | Purpose | Canonical? |
+|--------|---------|:----------:|
+| `Memory/` | Decisions, conventions, architecture, gotchas | Yes |
+| `History/` | What happened and when | Yes |
+| `Evidence/` | Raw imports, docs, extracts | No |
+| `Outputs/` | Generated views, search index | No |
+
+Reading order:
+1. `Memory/MEMORY.md` — always first
+2. Relevant branch entry notes
+3. Leaf notes only when the specific detail is needed
+4. Keep context lean — do not load branches unrelated to the current task
