@@ -1,7 +1,7 @@
 ---
 note_type: durable-branch
 area: integrations
-updated: 2026-04-29
+updated: 2026-05-05
 tags:
   - agent-knowledge
   - memory
@@ -15,52 +15,51 @@ update_when: >
 
 # Integrations
 
-Multi-tool detection and bridge file installation for Cursor, Claude, and Codex.
+Multi-tool detection and bridge file installation for Cursor, Claude, Codex, Gemini CLI, and Antigravity.
 
 ## Detection (`runtime/integrations.py`)
 
 | Tool | Detection | Always installed? |
 |------|-----------|-------------------|
-| Cursor | `.cursor/` exists | Yes (default integration) |
-| Claude | `.claude/` exists | Only if detected |
-| Codex | `.codex/` exists | Only if detected |
-
-Called by [[cli#init (zero-arg)|init]] via `detect()` then `install_all()`.
-
-**As of 0.2.5**: Cursor and Claude are both first-class. Detection table updated:
-
-| Tool | Detection | Always installed? |
-|------|-----------|-------------------|
 | Cursor | `.cursor/` exists | Yes |
-| Claude | `.claude/` exists OR `CLAUDE.md` exists | Yes (always, like Cursor) |
+| Claude | `.claude/` exists OR `CLAUDE.md` exists | Yes |
 | Codex | `.codex/` exists | Only if detected |
+| Gemini CLI / Antigravity | `.gemini/` exists OR `GEMINI.md` exists | Only if detected |
+
+Called by [[cli#init|init]] via `detect()` then `install_all()`.
 
 ## Bridge Files
 
 ### Cursor (first-class)
-- `.cursor/hooks.json` -- **4 hooks**: `post-write` (update), `session-start` (sync), `stop` (sync), `preCompact` (sync)
-- `.cursor/rules/bedrock.mdc` -- `alwaysApply` rule: knowledge layers table, onboarding flow, `/memory-update` reference (was `agent-knowledge.mdc`; auto-renamed by `refresh-system`)
-- `.cursor/commands/memory-update.md` -- `/memory-update` slash command
-- `.cursor/commands/system-update.md` -- `/system-update` slash command
+- `.cursor/hooks.json` -- 4 hooks: `post-write`, `session-start`, `stop`, `preCompact`
+- `.cursor/rules/bedrock.mdc` -- `alwaysApply` rule (was `agent-knowledge.mdc`; auto-renamed by `refresh-system`)
+- `.cursor/commands/memory-update.md`, `system-update.md`, `absorb.md`, `compact-context.md`
 
-Rule content is **inlined as `_CURSOR_RULE` in `integrations.py`** AND available as `assets/templates/integrations/cursor/bedrock.mdc`. `refresh.py` uses the template file if present, falls back to the constant.
-
-Constants in `integrations.py`:
-- `CURSOR_EXPECTED_HOOK_EVENTS = {"session-start", "post-write", "stop", "preCompact"}`
-- `CURSOR_EXPECTED_COMMANDS = {"memory-update.md", "system-update.md"}`
-
-`check_cursor_integration(repo_root)` in `refresh.py` validates all 3 components and is called by `doctor`.
-
-### Claude Code (first-class, added 0.2.5)
-- `.claude/settings.json` -- hooks: SessionStart (sync), Stop (sync), PreCompact (sync)
-- `.claude/CLAUDE.md` -- runtime contract: knowledge layers, onboarding flow, `/memory-update` reference
-- `.claude/commands/memory-update.md` -- `/memory-update` slash command
-- `.claude/commands/system-update.md` -- `/system-update` slash command
-
-`check_claude_integration(repo_root)` in `refresh.py` mirrors Cursor's health check. Called by `doctor`.
+### Claude Code (first-class)
+- `.claude/settings.json` -- hooks: SessionStart, Stop, PreCompact
+- `.claude/CLAUDE.md` -- runtime contract
+- `.claude/commands/memory-update.md`, `system-update.md`, `absorb.md`, `compact-context.md`
 
 ### Codex
-- `.codex/AGENTS.md` -- directs to root `AGENTS.md` and [[STATUS]]
+- `.codex/AGENTS.md` -- fully self-contained (v0.4.5+): includes onboarding, memory-update procedure, compact-context, knowledge structure. No longer defers to root AGENTS.md.
+
+### Gemini CLI / Antigravity (v0.4.7+)
+- `GEMINI.md` at project root — memory contract for Gemini CLI and Antigravity IDE
+- Both tools share `~/.gemini/GEMINI.md` as global config (`install-global` writes there)
+- Antigravity also reads `AGENTS.md` (already covered by root AGENTS.md)
+
+## Global Install (`bedrock install-global`)
+
+New in v0.4.6. Writes conditional rules to user-global config dirs so bedrock activates in any project with a `./bedrock/` vault — no per-project setup needed.
+
+| Target | Tool |
+|--------|------|
+| `~/.cursor/rules/bedrock-global.mdc` | Cursor |
+| `~/.claude/CLAUDE.md` (appended) | Claude Code |
+| `~/.codex/AGENTS.md` (appended) | Codex |
+| `~/.gemini/GEMINI.md` (appended) | Gemini CLI + Antigravity |
+
+All writes are sentinel-guarded (idempotent). `--uninstall` removes them. `--dry-run` previews.
 
 ## Onboarding Handoff
 
@@ -96,6 +95,9 @@ Cursor rule content is **inlined as `_CURSOR_RULE`** in `integrations.py` AND st
 ## Recent Changes
 
 - 2026-04-29: Cursor rule renamed `agent-knowledge.mdc` → `bedrock.mdc`. `refresh-system` auto-migrates existing installs. All bridge file path references updated to `./bedrock/`. `repo_abs` now uses `.as_posix()` to generate forward-slash paths (Windows JSON fix).
+- 2026-05-05: v0.4.5 — `.codex/AGENTS.md` rewritten to be fully self-contained; removed dependency on root AGENTS.md.
+- 2026-05-05: v0.4.6 — `install-global` command added; installs conditional rules in `~/.cursor/`, `~/.claude/`, `~/.codex/`.
+- 2026-05-05: v0.4.7 — Gemini CLI + Antigravity added; `GEMINI.md` template; detection via `.gemini/` or `GEMINI.md`; `install-global` writes `~/.gemini/GEMINI.md`.
 
 ## See Also
 

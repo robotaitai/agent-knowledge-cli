@@ -34,11 +34,20 @@ See [[architecture#Path Resolution]] for how the code finds these at runtime.
 
 ## Version
 
-Current: **0.4.1** (tagged `v0.4.1`). PyPI package name: `project-bedrock`. See [[deployments]].
+Current: **0.4.7** (tagged `v0.4.7`). PyPI package name: `project-bedrock`. See [[deployments]].
 
 Install: `pip install project-bedrock` or `pipx install project-bedrock`. Command: `bedrock`.
 
 **Breaking change in 0.4.0**: vault folder renamed from `./agent-knowledge/` to `./bedrock/`. Existing users run `bedrock migrate-vault` then `bedrock refresh-system`.
+
+## PyPI Publish
+
+CI trusted publishing (OIDC) is currently broken — the PyPI trusted publisher config doesn't match the workflow. Publishing is done locally via twine from a temp venv:
+```bash
+python3 -m venv /tmp/build-venv && /tmp/build-venv/bin/pip install build twine
+/tmp/build-venv/bin/python -m build && /tmp/build-venv/bin/twine upload dist/*
+```
+Fix: go to PyPI project settings → Publishing → update trusted publisher to match `publish.yml` (no environment field).
 
 ## Dependencies
 
@@ -53,6 +62,11 @@ See [[stack#Dependencies]] for the full list.
 - 2026-04-28: `migrate-from-legacy` command added to help existing users migrate (v0.3.2). `pipx install project-bedrock` recommended for global install.
 - 2026-04-29: v0.4.0 — vault folder renamed `agent-knowledge/` → `bedrock/` everywhere. `migrate-vault` command added for existing users. Windows compatibility fixes (bash detection, JSON paths, UTF-8 git output).
 - 2026-04-30: v0.4.1 — `completion`, `upgrade`, `/compact-context` commands added. Specialist commands hidden from `--help`. CI tests fixed for v0.4.0 rename.
+- 2026-05-05: v0.4.3 — wikilink JS regex fix (`\\.md` → `\.md`); README agent-first install flow.
+- 2026-05-05: v0.4.4 — `encoding="utf-8"` added to all `read_text()`/`write_text()` calls across 8 modules (fixes Windows cp1255 crash).
+- 2026-05-05: v0.4.5 — `.codex/AGENTS.md` template rewritten to be fully self-contained (no longer defers to root AGENTS.md).
+- 2026-05-05: v0.4.6 — `install-global` command added; writes to `~/.cursor/rules/`, `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`.
+- 2026-05-05: v0.4.7 — Gemini CLI + Antigravity support; `GEMINI.md` template; `~/.gemini/GEMINI.md` in `install-global`.
 
 ## See Also
 
