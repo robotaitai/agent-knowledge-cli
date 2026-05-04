@@ -1470,6 +1470,7 @@ def completion(shell: str | None, install: bool) -> None:
 _GLOBAL_SENTINEL_CURSOR = "# bedrock-global"
 _GLOBAL_SENTINEL_CLAUDE = "<!-- bedrock-global -->"
 _GLOBAL_SENTINEL_CODEX = "<!-- bedrock-global -->"
+_GLOBAL_SENTINEL_GEMINI = "<!-- bedrock-global -->"
 
 _GLOBAL_CURSOR_RULE = """\
 ---
@@ -1519,12 +1520,27 @@ At end of session with meaningful work:
 <!-- /bedrock-global -->
 """
 
+_GLOBAL_GEMINI_MD = """\
+
+<!-- bedrock-global -->
+## Project Bedrock (if present)
+
+If this project has `./bedrock/STATUS.md`:
+
+1. Read `./bedrock/STATUS.md`
+2. If `onboarding: pending` — read `AGENTS.md` and follow First-Time Onboarding
+3. If `onboarding: complete` — read `./bedrock/Memory/MEMORY.md`, then load branch notes relevant to the current task
+
+At end of session with meaningful work, update `./bedrock/Memory/` and run `bedrock sync --project .`
+<!-- /bedrock-global -->
+"""
+
 
 @main.command("install-global")
 @click.option("--uninstall", is_flag=True, help="Remove bedrock from global config files.")
 @click.option("--dry-run", is_flag=True, help="Show what would change without writing.")
 def install_global(uninstall: bool, dry_run: bool) -> None:
-    """Install bedrock into global agent config (~/.cursor, ~/.claude, ~/.codex).
+    """Install bedrock into global agent config (~/.cursor, ~/.claude, ~/.codex, ~/.gemini).
 
     Adds a lightweight conditional rule to each tool's global config so
     any project with a bedrock vault is picked up automatically — no per-project
@@ -1617,6 +1633,40 @@ def install_global(uninstall: bool, dry_run: bool) -> None:
                 with codex_agents.open("a", encoding="utf-8") as f:
                     f.write(_GLOBAL_CODEX_AGENTS_MD)
             actions.append(f"  {'[dry-run] would write' if dry_run else 'wrote'}: {codex_agents}")
+
+    # ── Gemini CLI / Antigravity: ~/.gemini/GEMINI.md ─────────────────────────
+    gemini_md = home / ".gemini" / "GEMINI.md"
+    if uninstall:
+        if gemini_md.exists():
+            text = gemini_md.read_text(encoding="utf-8")
+            if _GLOBAL_SENTINEL_GEMINI in text:
+                import re as _re3
+                cleaned = _re3.sub(
+                    r"\n<!-- bedrock-global -->.*?<!-- /bedrock-global -->\n?",
+                    "",
+                    text,
+                    flags=_re3.DOTALL,
+                ).strip()
+                if not dry_run:
+                    if cleaned:
+                        gemini_md.write_text(cleaned + "\n", encoding="utf-8")
+                    else:
+                        gemini_md.unlink()
+                actions.append(f"  removed section from: {gemini_md}")
+            else:
+                actions.append(f"  skip (not installed): {gemini_md}")
+        else:
+            actions.append(f"  skip (not installed): {gemini_md}")
+    else:
+        existing = gemini_md.read_text(encoding="utf-8") if gemini_md.exists() else ""
+        if _GLOBAL_SENTINEL_GEMINI in existing:
+            actions.append(f"  up-to-date: {gemini_md}")
+        else:
+            if not dry_run:
+                gemini_md.parent.mkdir(parents=True, exist_ok=True)
+                with gemini_md.open("a", encoding="utf-8") as f:
+                    f.write(_GLOBAL_GEMINI_MD)
+            actions.append(f"  {'[dry-run] would append' if dry_run else 'appended'}: {gemini_md}")
 
     verb = "Uninstalled" if uninstall else "Installed"
     click.echo(f"{verb} bedrock global config:", err=True)

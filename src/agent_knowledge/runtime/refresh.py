@@ -336,6 +336,27 @@ def _refresh_codex_agents_md(repo_root: Path, *, dry_run: bool) -> dict[str, Any
     return {"target": ".codex/AGENTS.md", "action": action, "detail": "refreshed from bundled template"}
 
 
+def _refresh_gemini_md(repo_root: Path, *, dry_run: bool) -> dict[str, Any]:
+    """Refresh GEMINI.md from the bundled template (Gemini CLI / Antigravity)."""
+    target = repo_root / "GEMINI.md"
+    template_path = get_assets_dir() / "templates" / "integrations" / "gemini" / "GEMINI.md"
+
+    if not template_path.is_file():
+        return {"target": "GEMINI.md", "action": "skip", "detail": "bundled template not found"}
+
+    if not target.is_file():
+        return {"target": "GEMINI.md", "action": "skip", "detail": "not installed; run: bedrock init"}
+
+    template = template_path.read_text(encoding="utf-8")
+    current = target.read_text(encoding="utf-8", errors="replace")
+
+    if current.strip() == template.strip():
+        return {"target": "GEMINI.md", "action": "up-to-date", "detail": "already matches template"}
+
+    action = _write(target, template, dry_run=dry_run)
+    return {"target": "GEMINI.md", "action": action, "detail": "refreshed from bundled template"}
+
+
 def _refresh_status_md(vault_dir: Path, version: str, *, dry_run: bool) -> dict[str, Any]:
     """Update framework_version and last_system_refresh in STATUS.md frontmatter.
 
@@ -700,6 +721,11 @@ def run_refresh(
     # Codex integration (if detected)
     if detected.get("codex"):
         r = _refresh_codex_agents_md(repo_root, dry_run=dry_run)
+        changes.append(r)
+
+    # Gemini CLI / Antigravity integration (if detected)
+    if detected.get("gemini"):
+        r = _refresh_gemini_md(repo_root, dry_run=dry_run)
         changes.append(r)
 
     # STATUS.md — version markers

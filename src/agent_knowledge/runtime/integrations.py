@@ -19,7 +19,7 @@ CLAUDE_EXPECTED_HOOK_EVENTS = {"SessionStart", "Stop", "PreCompact"}
 # Expected Claude command files.
 CLAUDE_EXPECTED_COMMANDS = {"memory-update.md", "system-update.md", "absorb.md", "compact-context.md"}
 
-TOOLS = ("cursor", "claude", "codex")
+TOOLS = ("cursor", "claude", "codex", "gemini")
 
 
 def detect(repo: Path) -> dict[str, bool]:
@@ -28,6 +28,7 @@ def detect(repo: Path) -> dict[str, bool]:
         "cursor": (repo / ".cursor").is_dir(),
         "claude": (repo / ".claude").is_dir() or (repo / "CLAUDE.md").is_file(),
         "codex": (repo / ".codex").is_dir(),
+        "gemini": (repo / ".gemini").is_dir() or (repo / "GEMINI.md").is_file(),
     }
 
 
@@ -206,10 +207,30 @@ def install_codex(repo: Path, *, dry_run: bool = False, force: bool = False) -> 
     return actions
 
 
+def install_gemini(repo: Path, *, dry_run: bool = False, force: bool = False) -> list[str]:
+    """Install Gemini CLI / Antigravity GEMINI.md integration."""
+    assets = get_assets_dir()
+    actions = []
+
+    src = assets / "templates" / "integrations" / "gemini" / "GEMINI.md"
+    dst = repo / "GEMINI.md"
+
+    if dst.exists() and not force:
+        actions.append(f"  exists: GEMINI.md")
+    elif dry_run:
+        actions.append(f"  [dry-run] would create: GEMINI.md")
+    else:
+        shutil.copy2(src, dst)
+        actions.append(f"  created: GEMINI.md")
+
+    return actions
+
+
 _INSTALLERS = {
     "cursor": install_cursor,
     "claude": install_claude,
     "codex": install_codex,
+    "gemini": install_gemini,
 }
 
 
@@ -240,5 +261,9 @@ def install_all(
     # Codex: install only when detected
     if detected.get("codex", False):
         results["codex"] = _INSTALLERS["codex"](repo, dry_run=dry_run, force=force)
+
+    # Gemini CLI / Antigravity: install only when detected
+    if detected.get("gemini", False):
+        results["gemini"] = _INSTALLERS["gemini"](repo, dry_run=dry_run, force=force)
 
     return results
