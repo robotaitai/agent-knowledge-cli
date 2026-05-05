@@ -1,7 +1,7 @@
 ---
 note_type: durable-branch
 area: cli
-updated: 2026-04-30
+updated: 2026-05-05
 tags:
   - agent-knowledge
   - cli
@@ -19,7 +19,7 @@ Design and implementation of the `bedrock` command-line interface.
 
 Built on [[stack|click >= 8.0]] with a `@click.group()` top-level.
 
-## Subcommands (27)
+## Subcommands (28)
 
 | Command | Description | Delegates to |
 |---------|-------------|-------------|
@@ -50,6 +50,7 @@ Built on [[stack|click >= 8.0]] with a `@click.group()` top-level.
 | `migrate-from-legacy` | Migrate from agent-knowledge-cli: runs refresh-system + prints pip uninstall steps | pure Python |
 | `completion` | Print shell tab-completion setup line (zsh/bash/fish); `--install` writes to rc file | pure Python |
 | `upgrade` | Check PyPI for latest version and upgrade (detects pipx vs pip) | pure Python |
+| `install-global` | Write conditional bedrock rules to `~/.cursor/`, `~/.claude/`, `~/.codex/`, `~/.gemini/`; `--uninstall` to remove | pure Python |
 | `compact-context` | (slash command) Save memory then reset context window | slash command template |
 
 ## init
@@ -134,6 +135,7 @@ flowchart LR
 - 2026-04-28: `migrate-from-legacy` added — runs refresh-system and prints pip migration instructions for agent-knowledge-cli users.
 - 2026-04-29: vault path changed `agent-knowledge/` → `bedrock/` in all CLI commands. `migrate-vault` added (24 total commands). `refresh-system` now auto-renames `agent-knowledge.mdc` → `bedrock.mdc`. Windows: bash auto-detected, JSON paths use forward slashes, git subprocesses use UTF-8.
 - 2026-04-30: `completion` command added (tab completion for zsh/bash/fish, `--install` flag). `upgrade` command added (checks PyPI, detects pipx vs pip). `/compact-context` slash command added for Claude + Cursor. 8 specialist commands hidden from `--help` (still callable). Total: 27 commands (+ 1 slash command). CI fixed: tests updated for v0.4.0 rename (bedrock paths, local mode default, STATUS.md timestamp format).
+- 2026-05-05: `install-global` command added (v0.4.6) — writes conditional bedrock rules to global agent config dirs for Cursor, Claude, Codex, Gemini CLI, Antigravity. Idempotent, `--uninstall` supported. Total: 28 commands.
 
 ## See Also
 

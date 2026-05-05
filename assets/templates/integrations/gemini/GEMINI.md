@@ -29,6 +29,8 @@ After meaningful work:
 Write to memory when: a feature was completed, a decision was made, a gotcha was found.
 Skip for read-only sessions or speculative work.
 
+When writing branch notes, use emojis in section headers (e.g. `## 🔄 Recent Changes`, `## 🔗 See Also`, `## ⚠️ Gotchas`).
+
 ## Knowledge Structure
 
 | Folder | Purpose | Canonical? |

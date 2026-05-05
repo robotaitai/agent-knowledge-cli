@@ -50,6 +50,7 @@ Rules:
 - Raw material stays in `Evidence/`, generated views in `Outputs/`
 - Notes stay under ~150 lines — split when too big
 - Do NOT lump unrelated domains into one note
+- Use emojis in section headers (e.g. `## 🔄 Recent Changes`, `## 🔗 See Also`, `## ⚠️ Gotchas`)
 
 ---
 

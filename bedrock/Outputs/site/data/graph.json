@@ -1,6 +1,6 @@
 {
   "schema": "1",
-  "generated": "2026-05-04T13:19:45Z",
+  "generated": "2026-05-05T20:26:37Z",
   "project_slug": "bedrock",
   "nodes": [
     {
@@ -64,7 +64,7 @@
       "label": "Integrations",
       "type": "branch",
       "canonical": true,
-      "summary": "Multi-tool detection and bridge file installation for Cursor, Claude, and Codex. Called by init via detect() then instal",
+      "summary": "Multi-tool detection and bridge file installation for Cursor, Claude, Codex, Gemini CLI, and Antigravity. Called by init",
       "path": "Memory/integrations.md"
     },
     {
@@ -92,11 +92,19 @@
       "path": "Memory/testing.md"
     },
     {
+      "id": "evidence/Evidence/raw/git-recent.md",
+      "label": "Recent Git History",
+      "type": "evidence",
+      "canonical": false,
+      "summary": "Last 30 commits as of 2026-05-05. e3ebc01 fix: add decisions step to every memory-update template (v",
+      "path": "Evidence/raw/git-recent.md"
+    },
+    {
       "id": "output/Outputs/knowledge-index.md",
       "label": "Knowledge Index",
       "type": "output",
       "canonical": false,
-      "summary": "> Generated output. Not canonical. Do not treat as Memory. Generated: 2026-05-04T13:17:43Z Total not",
+      "summary": "> Generated output. Not canonical. Do not treat as Memory. Generated: 2026-05-05T19:40:46Z Total not",
       "path": "Outputs/knowledge-index.md"
     }
   ],
@@ -160,6 +168,12 @@
       "target": "branch/Memory/testing.md",
       "type": "contains",
       "inferred": false
+    },
+    {
+      "source": "project/bedrock",
+      "target": "evidence/Evidence/raw/git-recent.md",
+      "type": "supported_by",
+      "inferred": true
     },
     {
       "source": "project/bedrock",
@@ -373,7 +387,7 @@
     }
   ],
   "stats": {
-    "node_count": 12,
-    "edge_count": 45
+    "node_count": 13,
+    "edge_count": 46
   }
 }

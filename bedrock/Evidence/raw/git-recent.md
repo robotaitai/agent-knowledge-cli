@@ -1,7 +1,7 @@
 ---
 note_type: evidence
 source: git-log
-extracted: 2026-05-04T21:53:47Z
+extracted: 2026-05-05T19:40:46Z
 commits: 30
 ---
 
@@ -10,6 +10,18 @@ commits: 30
 Last 30 commits as of 2026-05-05.
 
 ```
+e3ebc01 fix: add decisions step to every memory-update template (v0.4.8)
+802d16e memory: add decisions 011-014 (bedrock rename, mermaid, gemini/antigravity, install-global)
+b15c19d memory: update packaging, integrations, cli, gotchas for v0.4.3–v0.4.7
+0207efa feat: add Gemini CLI + Antigravity support; bump v0.4.7
+25fd501 feat: add install-global command; bump v0.4.6
+cb34708 fix: revert environment from publish workflow (PyPI trusted publisher has no env)
+87ada28 fix: add environment: pypi to publish job for trusted publisher OIDC
+2444c61 fix: expand .codex/AGENTS.md to be fully self-contained; bump v0.4.5
+2359525 fix: add encoding="utf-8" to all file read/write calls; bump v0.4.4
+8282256 fix: wikilink JS regex + README install flow; bump v0.4.3
+47e3c8a fix: Mermaid diagrams now render in SPA via retry-on-load pattern
+a509a8a feat: Mermaid diagram support in site.py + diagrams in memory notes
 59d36e6 fix: unhide migrate-vault/migrate-from-legacy; add migration hint to CLAUDE.md template; bump v0.4.2
 3416010 docs: rework README for Windows support, v0.4.0 vault rename, Codex as first-class
 06600a4 docs: upgrade Windows to full support in compatibility matrix (v0.4.0 fixes)
@@ -28,16 +40,4 @@ fddebe9 feat: add bedrock upgrade command (checks PyPI, detects pipx vs pip)
 dc0e73b chore: memory update -- v0.3.1/0.3.2 CLI rename and migration
 9f47e48 feat: add migrate-from-legacy command and migration guide (v0.3.2)
 0efb000 docs: add high-quality demo GIF (800px, 12fps, 7.5MB)
-59d0286 docs: add demo.webm and replace GIF with video in README
-c7ccbf7 feat: rename CLI command to bedrock, keep agent-knowledge as deprecated alias
-aa3ad87 docs: add demo.webm screencast
-d61f345 docs: add cover image to README header
-d179995 rebrand: rename PyPI package to project-bedrock
-6e0435b docs: restyle README body -- emojis, collapsible sections, visual hierarchy, badges
-edfa361 docs: split README -- move reference sections to docs/reference.md, link from main
-0f4d93a docs: redesign README header -- centered title, team name, badge pills, full-width GIF
-038cf67 docs: stretch tour GIF to full page width
-c973629 docs: add star history chart to README
-c165a3f fix: graph no longer re-animates when returning to tab; elastic drag restored
-b421cd7 docs: add agent-knowledge-tour.gif demo to README
 ```

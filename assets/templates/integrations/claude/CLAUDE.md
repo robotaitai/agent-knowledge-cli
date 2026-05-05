@@ -42,3 +42,4 @@ Otherwise:
 - Run `/compact-context` — saves memory, then resets the context window
 
 Keep ontology small and project-native. Do not force generic templates.
+Use emojis in section headers when writing or updating branch notes (e.g. `## 🔄 Recent Changes`, `## 🔗 See Also`, `## ⚠️ Gotchas`).

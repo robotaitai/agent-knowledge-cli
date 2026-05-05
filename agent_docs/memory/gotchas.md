@@ -1,7 +1,7 @@
 ---
 note_type: durable-branch
 area: gotchas
-updated: 2026-04-28
+updated: 2026-05-05
 tags:
   - agent-knowledge
   - memory
@@ -40,9 +40,22 @@ Known pitfalls, traps, and non-obvious behaviors.
 
 - **f-string backslash (Python < 3.12)**: `re.sub(r'...', '', val)` cannot be called directly inside an f-string `{}` on Python 3.10/3.11 — raises `SyntaxError: f-string expression part cannot include a backslash`. Extract the call to a local variable first. Fixed in `runtime/site.py` (2026-04-28). Python 3.12+ relaxed this restriction.
 
+## Windows Encoding
+
+- **cp1255 / system locale crash**: On Windows with a non-UTF-8 system locale (e.g. Hebrew cp1255), Python uses the locale encoding for `read_text()` / `write_text()` by default. Every file I/O call across `cli.py`, `sync.py`, `index.py`, `capture.py`, `history.py`, `integrations.py`, `refresh.py`, `absorb.py` now explicitly passes `encoding="utf-8"`. Fixed in v0.4.4.
+
+## Site / JS
+
+- **Wikilink stem regex** (`findNoteBySlug` in `site.py` HTML template): inside a Python raw string, `\\.md` outputs `\\.md` to JS which matches a literal backslash, not a dot. Correct Python raw string: `\.md` → JS sees `\.md` = literal dot. Fixed in v0.4.3.
+
+## CI / PyPI
+
+- **Trusted publishing broken**: PyPI trusted publisher config does not match the workflow. Publishing is done manually via twine. To fix: remove the trusted publisher on PyPI and re-add it without an environment field. See [[packaging#PyPI Publish]].
+
 ## Recent Changes
 
 - 2026-04-28: Documented f-string backslash `SyntaxError` on Python < 3.12; fixed in `runtime/site.py`.
+- 2026-05-05: Documented Windows cp1255 encoding crash; fixed in v0.4.4. Documented JS wikilink regex bug; fixed in v0.4.3. Documented PyPI trusted publishing breakage.
 
 ## See Also
 

@@ -7,7 +7,7 @@ tags:
   - decision
 ---
 
-# Decision Log
+# 📋 Decision Log
 
 Architectural and process decisions for agent-knowledge.
 
@@ -109,7 +109,7 @@ Architectural and process decisions for agent-knowledge.
 - **Decision**: Add `bedrock install-global` that writes conditional rules to `~/.cursor/rules/`, `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, `~/.gemini/GEMINI.md`. Rules are sentinel-guarded (idempotent) and activate only when `./bedrock/STATUS.md` exists in the project.
 - **Status**: Active
 
-## See Also
+## 🔗 See Also
 
 - [[architecture]] -- where these decisions are applied
 - [[gotchas]] -- problems these decisions solve

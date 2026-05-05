@@ -1,6 +1,6 @@
 ---
 note_type: output
-generated: 2026-05-04T21:53:47Z
+generated: 2026-05-05T19:40:46Z
 canonical: false
 ---
 
@@ -8,7 +8,7 @@ canonical: false
 
 > Generated output. Not canonical. Do not treat as Memory.
 
-Generated: 2026-05-04T21:53:47Z  
+Generated: 2026-05-05T19:40:46Z  
 Total notes: 14
 
 ## Memory [canonical]
@@ -30,7 +30,7 @@ Total notes: 14
 - **History Layer** `Memory/history-layer.md`
   Lightweight project diary. Records what happened over time without becoming a second knowledge base. History/ events.ndj...
 - **Integrations** `Memory/integrations.md`
-  Multi-tool detection and bridge file installation for Cursor, Claude, and Codex. Called by init via detect() then instal...
+  Multi-tool detection and bridge file installation for Cursor, Claude, Codex, Gemini CLI, and Antigravity. Called by init...
 - **Packaging** `Memory/packaging.md`
   Python packaging strategy for making bedrock pip-installable. - Backend: hatchling via pyproject.toml - Layout: src-layo...
 - **Stack** `Memory/stack.md`
@@ -41,10 +41,10 @@ Total notes: 14
 ## Evidence [non-canonical]
 
 - **Recent Git History** `Evidence/raw/git-recent.md`
-  Last 30 commits as of 2026-05-05. 59d36e6 fix: unhide migrate-vault/migrate-from-legacy; add migration hint to CLAUDE.md...
+  Last 30 commits as of 2026-05-05. e3ebc01 fix: add decisions step to every memory-update template (v0.4.8) 802d16e memor...
 
 ## Outputs [non-canonical]
 
 - **Knowledge Index** `Outputs/knowledge-index.md`
-  > Generated output. Not canonical. Do not treat as Memory. Generated: 2026-05-04T21:52:28Z Total notes: 14 - Memory Memo...
+  > Generated output. Not canonical. Do not treat as Memory. Generated: 2026-05-05T19:39:37Z Total notes: 14 - Memory Memo...
 

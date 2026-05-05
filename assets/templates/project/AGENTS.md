@@ -53,6 +53,9 @@ Rules:
 - Do not create deep trees automatically -- grow only when justified
 - Do NOT lump unrelated subsystems into a single "architecture" note.
   Split by functional domain instead.
+- Use emojis in section headers to improve scannability. Pick an emoji that
+  matches the section's purpose (e.g. `## 🔄 Recent Changes`, `## 🔗 See Also`,
+  `## ⚠️ Gotchas`, `## 📦 Build`, `## 🔍 Detection`, `## 🧩 Patterns`).
 
 ## Onboarding Rules
 

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-05-04T21:53:47Z",
+  "generated": "2026-05-05T19:40:46Z",
   "vault": "/Users/taio/code/agent-knowledge/bedrock",
   "note_count": 14,
   "notes": [
@@ -21,7 +21,7 @@
       "canonical": true,
       "folder": "Memory",
       "is_branch_entry": false,
-      "summary": "Core design: path resolution, runtime modules, project config, integrations, knowledge vault model. Two storage modes controlled by vault_mode in .agent-project.yaml: bedrock init defaults to local mo..."
+      "summary": "Core design: path resolution, runtime modules, project config, integrations, knowledge vault model. Two storage modes controlled by vault_mode in .agent-project.yaml: flowchart LR subgraph local[\"loca..."
     },
     {
       "path": "Memory/cli.md",
@@ -91,7 +91,7 @@
       "canonical": true,
       "folder": "Memory",
       "is_branch_entry": false,
-      "summary": "Multi-tool detection and bridge file installation for Cursor, Claude, and Codex. Called by init via detect() then install_all(). As of 0.2.5: Cursor and Claude are both first-class. Detection table up..."
+      "summary": "Multi-tool detection and bridge file installation for Cursor, Claude, Codex, Gemini CLI, and Antigravity. Called by init via detect() then install_all(). - .cursor/hooks.json -- 4 hooks: post-write, s..."
     },
     {
       "path": "Memory/packaging.md",
@@ -131,7 +131,7 @@
       "canonical": false,
       "folder": "Evidence",
       "is_branch_entry": false,
-      "summary": "Last 30 commits as of 2026-05-05. 59d36e6 fix: unhide migrate-vault/migrate-from-legacy; add migration hint to CLAUDE.md template; bump v0.4.2 3416010 docs: rework README for Windows support, v0.4.0 v..."
+      "summary": "Last 30 commits as of 2026-05-05. e3ebc01 fix: add decisions step to every memory-update template (v0.4.8) 802d16e memory: add decisions 011-014 (bedrock rename, mermaid, gemini/antigravity, install-g..."
     },
     {
       "path": "Outputs/knowledge-index.md",
@@ -141,7 +141,7 @@
       "canonical": false,
       "folder": "Outputs",
       "is_branch_entry": false,
-      "summary": "> Generated output. Not canonical. Do not treat as Memory. Generated: 2026-05-04T21:52:28Z Total notes: 14 - Memory Memory/MEMORY.md (branch entry) - [packaging](packaging.md) -- PyPI: project-bedrock..."
+      "summary": "> Generated output. Not canonical. Do not treat as Memory. Generated: 2026-05-05T19:39:37Z Total notes: 14 - Memory Memory/MEMORY.md (branch entry) - [packaging](packaging.md) -- PyPI: project-bedrock..."
     }
   ]
 }
