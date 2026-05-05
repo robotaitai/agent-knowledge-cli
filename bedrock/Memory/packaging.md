@@ -1,7 +1,7 @@
 ---
 note_type: durable-branch
 area: packaging
-updated: 2026-04-30
+updated: 2026-05-06
 tags:
   - agent-knowledge
   - memory
@@ -34,7 +34,7 @@ See [[architecture#Path Resolution]] for how the code finds these at runtime.
 
 ## 🏷️ Version
 
-Current: **0.4.7** (tagged `v0.4.7`). PyPI package name: `project-bedrock`. See [[deployments]].
+Current: **0.4.10** (tagged `v0.4.10`). PyPI package name: `project-bedrock`. See [[deployments]].
 
 Install: `pip install project-bedrock` or `pipx install project-bedrock`. Command: `bedrock`.
 
@@ -67,6 +67,9 @@ See [[stack#Dependencies]] for the full list.
 - 2026-05-05: v0.4.5 — `.codex/AGENTS.md` template rewritten to be fully self-contained (no longer defers to root AGENTS.md).
 - 2026-05-05: v0.4.6 — `install-global` command added; writes to `~/.cursor/rules/`, `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`.
 - 2026-05-05: v0.4.7 — Gemini CLI + Antigravity support; `GEMINI.md` template; `~/.gemini/GEMINI.md` in `install-global`.
+- 2026-05-05: v0.4.8 — decisions step added to all memory-update templates and AGENTS.md/CLAUDE.md/Gemini/Codex contracts; memory-writeback.mdc updated.
+- 2026-05-05: v0.4.9 — emoji section headers in all Memory branch notes; agent templates instructed to use emojis; conventions.md updated.
+- 2026-05-06: v0.4.10 — test path fix: `agent-knowledge` → `bedrock` in test_packaging.py (leftover from v0.4.0 rename).
 
 ## 🔗 See Also
 
