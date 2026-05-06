@@ -1536,7 +1536,7 @@ def test_hooks_reference_installed_runtime(tmp_path: Path):
     for hook in data.get("hooks", []):
         cmd = hook.get("command", "")
         assert cmd.startswith("bedrock "), \
-            f"Hook '{hook["name"]}' must call bedrock, got: {cmd}"
+            f"Hook '{hook['name']}' must call bedrock, got: {cmd}"
 
 
 def test_refresh_system_installs_commands(tmp_path: Path):
